@@ -241,7 +241,7 @@
                 }
 
                 // Load words
-                const wordsResponse = await fetch('words.json');
+                const wordsResponse = await fetch('https://gist.githubusercontent.com/Beamingkhaled/d152a4920080c545b75203df0c6305a7/raw/2f1c1c8d4808433a4e34babc5dd64fed74b85ec4/spy-game-words.json');
                 const words = await wordsResponse.json();
                 const randomWord = words[Math.floor(Math.random() * words.length)];
 
