@@ -3,13 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>لعبة الجاسوس</title>
+    <title>لعبة الجاسوس 🕵️</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -33,9 +29,6 @@
             margin-bottom: 30px;
             font-size: 28px;
         }
-        .input-group {
-            margin-bottom: 20px;
-        }
         label {
             display: block;
             margin-bottom: 8px;
@@ -51,10 +44,7 @@
             font-size: 20px;
             text-align: center;
             font-weight: bold;
-        }
-        input:focus {
-            outline: none;
-            border-color: #667eea;
+            margin-bottom: 15px;
         }
         button {
             width: 100%;
@@ -68,19 +58,7 @@
             cursor: pointer;
             margin-top: 10px;
         }
-        button:hover {
-            background: #5568d3;
-        }
-        button:disabled {
-            background: #ccc;
-            cursor: not-allowed;
-        }
-        .status {
-            text-align: center;
-            margin-top: 20px;
-            font-size: 16px;
-            color: #666;
-        }
+        button:hover { background: #5568d3; }
         .role-display {
             text-align: center;
             margin-top: 30px;
@@ -88,6 +66,11 @@
             border-radius: 15px;
             font-size: 24px;
             font-weight: bold;
+            min-height: 150px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
         }
         .role-normal {
             background: #d4edda;
@@ -98,34 +81,29 @@
             background: #f8d7da;
             color: #721c24;
             border: 3px solid #dc3545;
-        }
-        .word-display {
-            margin-top: 20px;
             font-size: 32px;
-            color: #667eea;
         }
+        .word { font-size: 36px; color: #28a745; margin-top: 15px; }
         .timer {
             text-align: center;
-            font-size: 48px;
+            font-size: 42px;
             color: #764ba2;
             margin-top: 20px;
             font-weight: bold;
         }
         .player-label {
             text-align: center;
-            font-size: 18px;
+            font-size: 20px;
             color: #667eea;
-            margin-top: 15px;
+            margin-bottom: 20px;
             font-weight: bold;
         }
-        .hidden {
-            display: none;
-        }
-        .error {
-            color: #dc3545;
+        .hidden { display: none; }
+        .status {
             text-align: center;
-            margin-top: 10px;
-            font-weight: bold;
+            margin-top: 15px;
+            color: #666;
+            font-size: 16px;
         }
     </style>
 </head>
@@ -134,33 +112,125 @@
         <h1>🕵️ لعبة الجاسوس</h1>
         
         <div id="joinScreen">
-            <div class="input-group">
-                <label>رمز الغرفة</label>
-                <input type="tel" id="roomCode" placeholder="أدخل الرمز" maxlength="6" pattern="[0-9]*">
-            </div>
-            <button id="joinBtn">انضمام</button>
-            <div id="errorMsg" class="error hidden"></div>
-            <div class="status" id="statusMsg"></div>
+            <label>رمز الغرفة</label>
+            <input type="tel" id="roomCode" placeholder="أدخل الرمز" maxlength="6">
+            <button onclick="joinRoom()">انضمام</button>
+            <div class="status" id="status"></div>
         </div>
 
         <div id="gameScreen" class="hidden">
             <div class="player-label" id="playerLabel"></div>
-            <div class="role-display" id="roleDisplay"></div>
+            <div class="role-display" id="roleDisplay">⏳ في انتظار بدء الجولة...</div>
             <div class="timer" id="timer"></div>
         </div>
     </div>
 
     <script>
-        const API_BASE = 'https://api.jsonbin.io/v3/b';
-        const API_KEY = '$2a$10$XhxCQZ0VNGKLwYYXGZvkTurIxMiNNLI.vFCQqKYWqZvkXhxCQZ0VN'; // Replace with your JSONBin API key
-        
-        let roomCode = '';
-        let playerId = '';
-        let playerNumber = 0;
-        let pollInterval = null;
-        let timerInterval = null;
+        const STORAGE_KEY = 'spy_game_';
+        let roomCode, playerId, playerNum;
+        let pollTimer;
 
-        // Get or create player ID
-        function getPlayerId() {
-            let id = localStorage.getItem('playerId');
-            if (!id) {​​​​​​​​​​​​​​​​
+        function joinRoom() {
+            roomCode = document.getElementById('roomCode').value.trim();
+            if (!roomCode || !/^\d+$/.test(roomCode)) {
+                alert('الرجاء إدخال رمز صحيح (أرقام فقط)');
+                return;
+            }
+
+            playerId = localStorage.getItem('playerId') || 'p_' + Date.now() + Math.random().toString(36).substr(2, 9);
+            localStorage.setItem('playerId', playerId);
+
+            let room = getRoom();
+            if (!room) {
+                document.getElementById('status').textContent = 'الغرفة غير موجودة';
+                return;
+            }
+
+            if (!room.players.find(p => p.id === playerId)) {
+                playerNum = room.players.length + 1;
+                room.players.push({ id: playerId, num: playerNum });
+                saveRoom(room);
+            } else {
+                playerNum = room.players.find(p => p.id === playerId).num;
+            }
+
+            sessionStorage.setItem('roomCode', roomCode);
+            sessionStorage.setItem('playerNum', playerNum);
+
+            showGameScreen();
+            startPolling();
+        }
+
+        function showGameScreen() {
+            document.getElementById('joinScreen').classList.add('hidden');
+            document.getElementById('gameScreen').classList.remove('hidden');
+            document.getElementById('playerLabel').textContent = `أنت: لاعب ${toArabic(playerNum)}`;
+        }
+
+        function startPolling() {
+            pollTimer = setInterval(() => {
+                let room = getRoom();
+                if (!room) return;
+
+                if (room.state === 'playing' && room.round) {
+                    showRole(room.round);
+                } else {
+                    document.getElementById('roleDisplay').innerHTML = '⏳ في انتظار بدء الجولة...';
+                    document.getElementById('roleDisplay').className = 'role-display';
+                }
+            }, 1500);
+        }
+
+        function showRole(round) {
+            const display = document.getElementById('roleDisplay');
+            if (round.spyId === playerId) {
+                display.innerHTML = '🕵️<br>أنت الجاسوس';
+                display.className = 'role-display role-spy';
+            } else {
+                display.innerHTML = `الكلمة السرية:<div class="word">${round.word}</div>`;
+                display.className = 'role-display role-normal';
+            }
+
+            if (round.startTime) {
+                updateTimer(round.startTime);
+            }
+        }
+
+        function updateTimer(startTime) {
+            const duration = 5 * 60;
+            setInterval(() => {
+                const elapsed = Math.floor((Date.now() - startTime) / 1000);
+                const remaining = Math.max(0, duration - elapsed);
+                const mins = Math.floor(remaining / 60);
+                const secs = remaining % 60;
+                document.getElementById('timer').textContent = 
+                    remaining > 0 ? `${toArabic(mins)}:${toArabic(secs.toString().padStart(2, '0'))}` : '⏰ انتهى الوقت';
+            }, 1000);
+        }
+
+        function getRoom() {
+            return JSON.parse(localStorage.getItem(STORAGE_KEY + roomCode));
+        }
+
+        function saveRoom(room) {
+            localStorage.setItem(STORAGE_KEY + roomCode, JSON.stringify(room));
+        }
+
+        function toArabic(num) {
+            const ar = ['٠','١','٢','٣','٤','٥','٦','٧','٨','٩'];
+            return num.toString().split('').map(d => ar[d] || d).join('');
+        }
+
+        // Restore session
+        window.onload = () => {
+            roomCode = sessionStorage.getItem('roomCode');
+            playerNum = sessionStorage.getItem('playerNum');
+            playerId = localStorage.getItem('playerId');
+            if (roomCode && playerNum) {
+                showGameScreen();
+                startPolling();
+            }
+        };
+    </script>
+</body>
+</html>
