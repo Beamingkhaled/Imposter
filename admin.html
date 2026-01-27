@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة التحكم - لعبة الجاسوس</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 500px;
+            margin: 0 auto;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        }
+        h1 {
+            text-align: center;
+            color: #f5576c;
+            margin-bottom: 30px;
+        }
+        .input-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: bold;
+        }
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 18px;
+            text-align: center;
+        }
+        button {
+            width: 100%;
+            padding: 15px;
+            background: #f5576c;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        button:hover {
+            background: #e04858;
+        }
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        .btn-secondary {
+            background: #6c757d;
+        }
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+        .btn-success {
+            background: #28a745;
+        }
+        .btn-success:hover {
+            background: #218838;
+        }
+        .room-info {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+        .room-code {
+            font-size: 48px;
+            font-weight: bold;
+            text-align: center;
+            color: #f5576c;
+            margin: 20px 0;
+        }
+        .players-list {
+            margin-top: 20px;
+        }
+        .player-item {
+            background: white;
+            padding: 12px;
+            margin-bottom: 8px;
+            border-radius: 8px;
+            font-weight: bold;
+            border: 2px solid #ddd;
+        }
+        .hidden {
+            display: none;
+        }
+        .status {
+            text-align: center;
+            padding: 10px;
+            margin-top: 10px;
+            border-radius: 8px;
+            font-weight: bold;
+        }
+        .status-waiting {
+            background: #fff3cd;
+            color: #856404;
+        }
+        .status-playing {
+            background: #d4edda;
+            color: #155724;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>👑 لوحة التحكم</h1>
+
+        <div id="loginScreen">
+            <div class="input-group">
+                <label>كلمة المرور</label>
+                <input type="password" id="adminPassword" placeholder="أدخل كلمة المرور">
+            </div>
+            <button id="loginBtn">دخول</button>
+        </div>
+
+        <div id="setupScreen" class="hidden">
+            <div class="input-group">
+                <label>رمز الغرفة (أرقام فقط)</label>
+                <input type="tel" id="newRoomCode" placeholder="مثال: 1234" maxlength="6">
+            </div>
+            <button id="createRoomBtn">إنشاء غرفة</button>
+        </div>
+
+        <div id="controlScreen" class="hidden">
+            <div class="room-info">
+                <div style="text-align: center; color: #666;">رمز الغرفة</div>
+                <div class="room-code" id="displayRoomCode"></div>
+                
+                <div class="status" id="gameStatus"></div>
+                
+                <div class="players-list">
+                    <h3 style="margin-bottom: 10px;">اللاعبين (<span id="playerCount">0</span>)</h3>
+                    <div id="playersList"></div>
+                </div>
+            </div>
+
+            <button id="startGameBtn" class="btn-success">بدء الجولة</button>
+            <button id="resetGameBtn" class="btn-secondary">جولة جديدة</button>
+            <button id="closeRoomBtn">إغلاق الغرفة</button>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'https://api.jsonbin.io/v3/b';
+        const API_KEY = '$2a$10$XhxCQZ0VNGKLwYYXGZvkTurIxMiNNLI.vFCQqKYWqZvkXhxCQZ0VN'; // Replace with your JSONBin API key
+        const ADMIN_PASSWORD = 'admin123'; // Change this!
+
+        let currentRoomCode = '';
+        let currentBinId = '';
+        let pollInterval = null;
+
+        // Login
+        document.getElementById('loginBtn').addEventListener('click', () => {
+            const password = document.getElementById('adminPassword').value;
+            if (password === ADMIN_PASSWORD) {
+                document.getElementById('loginScreen').classList.add('hidden');
+                document.getElementById('setupScreen').classList.remove('hidden');
+            } else {
+                alert('كلمة المرور خاطئة');
+            }
+        });
+
+        // Create room
+        document.getElementById('createRoomBtn').addEventListener('click', async () => {
+            const code = document.getElementById('newRoomCode').value.trim();
+            if (!code || !/^\d+$/.test(code)) {
+                alert('الرجاء إدخال رمز صحيح (أرقام فقط)');
+                return;
+            }
+
+            currentRoomCode = code;
+            currentBinId = 'room_' + code;
+
+            const roomData = {
+                roomCode: code,
+                status: 'open',
+                gameState: 'waiting',
+                players: [],
+                currentRound: null,
+                createdAt: Date.now()
+            };
+
+            try {
+                // Create bin
+                const response = await fetch(`${API_BASE}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Master-Key': API_KEY,
+                        'X-Bin-Name': currentBinId
+                    },
+                    body: JSON.stringify(roomData)
+                });
+
+                if (response.ok) {
+                    document.getElementById('setupScreen').classList.add('hidden');
+                    document.getElementById('controlScreen').classList.remove('hidden');
+                    document.getElementById('displayRoomCode').textContent = code;
+                    startPolling();
+                } else {
+                    alert('فشل إنشاء الغرفة');
+                }
+            } catch (error) {
+                console.error(error);
+                alert('حدث خطأ');
+            }
+        });
+
+        // Start game
+        document.getElementById('startGameBtn').addEventListener('click', async () => {
+            try {
+                const response = await fetch(`${API_BASE}/${currentBinId}/latest`, {
+                    headers: { 'X-Master-Key': API_KEY }
+                });
+                const data = await response.json();
+                const room = data.record;
+
+                if (room.players.length < 3) {
+                    alert('يجب أن يكون هناك 3 لاعبين على الأقل');
+                    return;
+                }
+
+                // Load words
+                const wordsResponse = await fetch('words.json');
+                const words = await wordsResponse.json();
+                const randomWord = words[Math.floor(Math.random() * words.length)];
+
+                // Pick random spy
+                const randomIndex = Math.floor(Math.random() * room.players.length);
+                const spyId = room.players[randomIndex].id;
+
+                room.gameState = 'playing';
+                room.currentRound = {
+                    word: randomWord,
+                    spyId: spyId,
+                    startTime: Date.now()
+                };
+
+                await fetch(`${API_BASE}/${currentBinId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Master-Key': API_KEY
+                    },
+                    body: JSON.stringify(room)
+                });
+
+            } catch (error) {
+                console.error(error);
+                alert('حدث خطأ في بدء الجولة');
+            }
+        });
+
+        // Reset game
+        document.getElementById('resetGameBtn').addEventListener('click', async () => {
+            if (!confirm('هل تريد بدء جولة جديدة؟')) return;
+
+            try {
+                const response = await fetch(`${API_BASE}/${currentBinId}/latest`, {
+                    headers: { 'X-Master-Key': API_KEY }
+                });
+                const data = await response.json();
+                const room = data.record;
+
+                room.gameState = 'waiting';
+                room.currentRound = null;
+
+                await fetch(`${API_BASE}/${currentBinId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Master-Key': API_KEY
+                    },
+                    body: JSON.stringify(room)
+                });
+
+            } catch (error) {
+                console.error(error);
+                alert('حدث خطأ');
+            }
+        });
+
+        // Close room
+        document.getElementById('closeRoomBtn').addEventListener('click', async () => {
+            if (!confirm('هل تريد إغلاق الغرفة؟')) return;
+
+            try {
+                const response = await fetch(`${API_BASE}/${currentBinId}/latest`, {
+                    headers: { 'X-Master-Key': API_KEY }
+                });
+                const data = await response.json();
+                const room = data.record;
+
+                room.status = 'closed';
+
+                await fetch(`${API_BASE}/${currentBinId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Master-Key': API_KEY
+                    },
+                    body: JSON.stringify(room)
+                });
+
+                location.reload();
+
+            } catch (error) {
+                console.error(error);
+                alert('حدث خطأ');
+            }
+        });
+
+        // Polling
+        function startPolling() {
+            pollInterval = setInterval(async () => {
+                try {
+                    const response = await fetch(`${API_BASE}/${currentBinId}/latest`, {
+                        headers: { 'X-Master-Key': API_KEY }
+                    });
+                    const data = await response.json();
+                    const room = data.record;
+
+                    document.getElementById('playerCount').textContent = room.players.length;
+                    
+                    const playersList = document.getElementById('playersList');
+                    playersList.innerHTML = room.players.map(p => 
+                        `<div class="player-item">لاعب ${convertToArabicNumber(p.number)}</div>`
+                    ).join('');
+
+                    const statusDiv = document.getElementById('gameStatus');
+                    if (room.gameState === 'playing') {
+                        statusDiv.textContent = '🎮 اللعبة قيد التشغيل';
+                        statusDiv.className = 'status status-playing';
+                        document.getElementById('startGameBtn').disabled = true;
+                    } else {
+                        statusDiv.textContent = '⏳ في انتظار البدء';
+                        statusDiv.className = 'status status-waiting';
+                        document.getElementById('startGameBtn').disabled = false;
+                    }
+
+                } catch (error) {
+                    console.error('Polling error:', error);
+                }
+            }, 2000);
+        }
+
+        function convertToArabicNumber(num) {
+            const arabicNums = ['٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩'];
+            return num.toString().split('').map(d => arabicNums[parseInt(d)] || d).join('');
+        }
+
+        window.addEventListener('beforeunload', () => {
+            if (pollInterval) clearInterval(pollInterval);
+        });
+    </script>
+</body>
+</html>
