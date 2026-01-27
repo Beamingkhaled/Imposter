@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>لعبة الجاسوس</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 400px;
+            width: 100%;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        }
+        h1 {
+            text-align: center;
+            color: #667eea;
+            margin-bottom: 30px;
+            font-size: 28px;
+        }
+        .input-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: bold;
+            font-size: 16px;
+        }
+        input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-size: 20px;
+            text-align: center;
+            font-weight: bold;
+        }
+        input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        button {
+            width: 100%;
+            padding: 18px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 20px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        button:hover {
+            background: #5568d3;
+        }
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        .status {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 16px;
+            color: #666;
+        }
+        .role-display {
+            text-align: center;
+            margin-top: 30px;
+            padding: 30px;
+            border-radius: 15px;
+            font-size: 24px;
+            font-weight: bold;
+        }
+        .role-normal {
+            background: #d4edda;
+            color: #155724;
+            border: 3px solid #28a745;
+        }
+        .role-spy {
+            background: #f8d7da;
+            color: #721c24;
+            border: 3px solid #dc3545;
+        }
+        .word-display {
+            margin-top: 20px;
+            font-size: 32px;
+            color: #667eea;
+        }
+        .timer {
+            text-align: center;
+            font-size: 48px;
+            color: #764ba2;
+            margin-top: 20px;
+            font-weight: bold;
+        }
+        .player-label {
+            text-align: center;
+            font-size: 18px;
+            color: #667eea;
+            margin-top: 15px;
+            font-weight: bold;
+        }
+        .hidden {
+            display: none;
+        }
+        .error {
+            color: #dc3545;
+            text-align: center;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🕵️ لعبة الجاسوس</h1>
+        
+        <div id="joinScreen">
+            <div class="input-group">
+                <label>رمز الغرفة</label>
+                <input type="tel" id="roomCode" placeholder="أدخل الرمز" maxlength="6" pattern="[0-9]*">
+            </div>
+            <button id="joinBtn">انضمام</button>
+            <div id="errorMsg" class="error hidden"></div>
+            <div class="status" id="statusMsg"></div>
+        </div>
+
+        <div id="gameScreen" class="hidden">
+            <div class="player-label" id="playerLabel"></div>
+            <div class="role-display" id="roleDisplay"></div>
+            <div class="timer" id="timer"></div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'https://api.jsonbin.io/v3/b';
+        const API_KEY = '$2a$10$XhxCQZ0VNGKLwYYXGZvkTurIxMiNNLI.vFCQqKYWqZvkXhxCQZ0VN'; // Replace with your JSONBin API key
+        
+        let roomCode = '';
+        let playerId = '';
+        let playerNumber = 0;
+        let pollInterval = null;
+        let timerInterval = null;
+
+        // Get or create player ID
+        function getPlayerId() {
+            let id = localStorage.getItem('playerId');
+            if (!id) {​​​​​​​​​​​​​​​​
