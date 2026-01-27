@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <title>لعبة الجاسوس 🕵️</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -128,7 +129,7 @@
     <script>
         const STORAGE_KEY = 'spy_game_';
         let roomCode, playerId, playerNum;
-        let pollTimer;
+        let pollTimer, timerInterval;
 
         function joinRoom() {
             roomCode = document.getElementById('roomCode').value.trim();
@@ -177,6 +178,11 @@
                 } else {
                     document.getElementById('roleDisplay').innerHTML = '⏳ في انتظار بدء الجولة...';
                     document.getElementById('roleDisplay').className = 'role-display';
+                    if (timerInterval) {
+                        clearInterval(timerInterval);
+                        timerInterval = null;
+                        document.getElementById('timer').textContent = '';
+                    }
                 }
             }, 1500);
         }
@@ -191,14 +197,14 @@
                 display.className = 'role-display role-normal';
             }
 
-            if (round.startTime) {
-                updateTimer(round.startTime);
+            if (round.startTime && !timerInterval) {
+                startTimer(round.startTime);
             }
         }
 
-        function updateTimer(startTime) {
+        function startTimer(startTime) {
             const duration = 5 * 60;
-            setInterval(() => {
+            timerInterval = setInterval(() => {
                 const elapsed = Math.floor((Date.now() - startTime) / 1000);
                 const remaining = Math.max(0, duration - elapsed);
                 const mins = Math.floor(remaining / 60);
@@ -221,7 +227,6 @@
             return num.toString().split('').map(d => ar[d] || d).join('');
         }
 
-        // Restore session
         window.onload = () => {
             roomCode = sessionStorage.getItem('roomCode');
             playerNum = sessionStorage.getItem('playerNum');
