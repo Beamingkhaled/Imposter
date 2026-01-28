@@ -1,241 +1,273 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-    <title>لعبة الجاسوس 🕵️</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-        }
-        .container {
-            background: white;
-            border-radius: 20px;
-            padding: 30px;
-            max-width: 400px;
-            width: 100%;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
-        }
-        h1 {
-            text-align: center;
-            color: #667eea;
-            margin-bottom: 30px;
-            font-size: 28px;
-        }
-        label {
-            display: block;
-            margin-bottom: 8px;
-            color: #333;
-            font-weight: bold;
-            font-size: 16px;
-        }
-        input {
-            width: 100%;
-            padding: 15px;
-            border: 2px solid #ddd;
-            border-radius: 10px;
-            font-size: 20px;
-            text-align: center;
-            font-weight: bold;
-            margin-bottom: 15px;
-        }
-        button {
-            width: 100%;
-            padding: 18px;
-            background: #667eea;
-            color: white;
-            border: none;
-            border-radius: 10px;
-            font-size: 20px;
-            font-weight: bold;
-            cursor: pointer;
-            margin-top: 10px;
-        }
-        button:hover { background: #5568d3; }
-        .role-display {
-            text-align: center;
-            margin-top: 30px;
-            padding: 30px;
-            border-radius: 15px;
-            font-size: 24px;
-            font-weight: bold;
-            min-height: 150px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-        }
-        .role-normal {
-            background: #d4edda;
-            color: #155724;
-            border: 3px solid #28a745;
-        }
-        .role-spy {
-            background: #f8d7da;
-            color: #721c24;
-            border: 3px solid #dc3545;
-            font-size: 32px;
-        }
-        .word { font-size: 36px; color: #28a745; margin-top: 15px; }
-        .timer {
-            text-align: center;
-            font-size: 42px;
-            color: #764ba2;
-            margin-top: 20px;
-            font-weight: bold;
-        }
-        .player-label {
-            text-align: center;
-            font-size: 20px;
-            color: #667eea;
-            margin-bottom: 20px;
-            font-weight: bold;
-        }
-        .hidden { display: none; }
-        .status {
-            text-align: center;
-            margin-top: 15px;
-            color: #666;
-            font-size: 16px;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <title>لعبة الجاسوس 🕵️</title>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{
+      font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;
+      background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);
+      min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;
+    }
+    .container{
+      background:#fff;border-radius:20px;padding:28px;max-width:420px;width:100%;
+      box-shadow:0 10px 40px rgba(0,0,0,.25);
+    }
+    h1{text-align:center;color:#667eea;margin-bottom:18px;font-size:28px}
+    label{display:block;margin:12px 0 8px;font-weight:800;color:#333}
+    input{
+      width:100%;padding:14px;border:2px solid #ddd;border-radius:12px;font-size:22px;
+      text-align:center;font-weight:900
+    }
+    button{
+      width:100%;padding:16px;margin-top:12px;border:0;border-radius:12px;
+      background:#667eea;color:#fff;font-size:20px;font-weight:900;cursor:pointer
+    }
+    button:hover{opacity:.92}
+    .status{margin-top:10px;text-align:center;color:#666;font-weight:700}
+    .hidden{display:none}
+    .player-label{text-align:center;font-size:18px;color:#667eea;font-weight:900;margin:6px 0 12px}
+    .role{
+      text-align:center;padding:22px;border-radius:16px;font-weight:900;min-height:160px;
+      display:flex;flex-direction:column;align-items:center;justify-content:center
+    }
+    .role.waiting{background:#f8f9fa;color:#555;border:2px solid #eee}
+    .role.normal{background:#d4edda;color:#155724;border:3px solid #28a745}
+    .role.spy{background:#f8d7da;color:#721c24;border:3px solid #dc3545;font-size:30px}
+    .word{font-size:34px;margin-top:10px}
+    .timer{text-align:center;font-size:40px;color:#764ba2;font-weight:900;margin-top:14px}
+  </style>
 </head>
 <body>
-    <div class="container">
-        <h1>🕵️ لعبة الجاسوس</h1>
-        
-        <div id="joinScreen">
-            <label>رمز الغرفة</label>
-            <input type="tel" id="roomCode" placeholder="أدخل الرمز" maxlength="6">
-            <button onclick="joinRoom()">انضمام</button>
-            <div class="status" id="status"></div>
-        </div>
+  <div class="container">
+    <h1>🕵️ لعبة الجاسوس</h1>
 
-        <div id="gameScreen" class="hidden">
-            <div class="player-label" id="playerLabel"></div>
-            <div class="role-display" id="roleDisplay">⏳ في انتظار بدء الجولة...</div>
-            <div class="timer" id="timer"></div>
-        </div>
+    <div id="joinScreen">
+      <label>رمز الغرفة (٤ أرقام)</label>
+      <input id="roomCode" type="tel" inputmode="numeric" maxlength="4" placeholder="1234">
+      <button id="joinBtn">انضمام</button>
+      <div class="status" id="status"></div>
     </div>
 
-    <script>
-        const STORAGE_KEY = 'spy_game_';
-        let roomCode, playerId, playerNum;
-        let pollTimer, timerInterval;
+    <div id="gameScreen" class="hidden">
+      <div class="player-label" id="playerLabel"></div>
+      <div class="role waiting" id="roleBox">⏳ في انتظار بدء الجولة...</div>
+      <div class="timer" id="timer"></div>
+    </div>
+  </div>
 
-        function joinRoom() {
-            roomCode = document.getElementById('roomCode').value.trim();
-            if (!roomCode || !/^\d+$/.test(roomCode)) {
-                alert('الرجاء إدخال رمز صحيح (أرقام فقط)');
-                return;
-            }
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    const SUPABASE_URL = "https://cpegnfupiqdgmqsguyed.supabase.co";
+    const SUPABASE_KEY = "sb_publishable_WKaLUCc9WeXbEcgDfMf1KQ_NKYoTVuU";
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-            playerId = localStorage.getItem('playerId') || 'p_' + Date.now() + Math.random().toString(36).substr(2, 9);
-            localStorage.setItem('playerId', playerId);
+    const $ = (id) => document.getElementById(id);
 
-            let room = getRoom();
-            if (!room) {
-                document.getElementById('status').textContent = 'الغرفة غير موجودة';
-                return;
-            }
+    let roomCode = "";
+    let playerUid = "";
+    let playerNum = null;
 
-            if (!room.players.find(p => p.id === playerId)) {
-                playerNum = room.players.length + 1;
-                room.players.push({ id: playerId, num: playerNum });
-                saveRoom(room);
-            } else {
-                playerNum = room.players.find(p => p.id === playerId).num;
-            }
+    let pollTimer = null;
+    let timerInterval = null;
+    let cachedRoundStart = null;
 
-            sessionStorage.setItem('roomCode', roomCode);
-            sessionStorage.setItem('playerNum', playerNum);
+    $("joinBtn").addEventListener("click", joinRoom);
 
-            showGameScreen();
-            startPolling();
+    function isValid4DigitCode(code){ return /^\d{4}$/.test(code); }
+
+    function getOrCreatePlayerUid(){
+      let uid = localStorage.getItem("spy_player_uid");
+      if (!uid) {
+        uid = "p_" + Date.now() + "_" + Math.random().toString(16).slice(2);
+        localStorage.setItem("spy_player_uid", uid);
+      }
+      return uid;
+    }
+
+    async function joinRoom(){
+      roomCode = $("roomCode").value.trim();
+      if (!isValid4DigitCode(roomCode)) return alert("اكتب رمز ٤ أرقام بالضبط");
+
+      playerUid = getOrCreatePlayerUid();
+
+      // Check room exists
+      const { data: room, error: rErr } = await supabase
+        .from("rooms")
+        .select("code,state")
+        .eq("code", roomCode)
+        .single();
+
+      if (rErr || !room) {
+        $("status").textContent = "الغرفة غير موجودة";
+        return;
+      }
+
+      // Ensure player row exists; assign player_num safely with retry
+      let attempts = 0;
+      while (attempts < 6) {
+        attempts++;
+
+        // If already joined, fetch your number
+        const { data: existing } = await supabase
+          .from("players")
+          .select("player_num")
+          .eq("room_code", roomCode)
+          .eq("player_uid", playerUid)
+          .maybeSingle();
+
+        if (existing && existing.player_num) {
+          playerNum = existing.player_num;
+          break;
         }
 
-        function showGameScreen() {
-            document.getElementById('joinScreen').classList.add('hidden');
-            document.getElementById('gameScreen').classList.remove('hidden');
-            document.getElementById('playerLabel').textContent = `أنت: لاعب ${toArabic(playerNum)}`;
+        // Count current players to suggest next number
+        const { data: list, error: lErr } = await supabase
+          .from("players")
+          .select("player_num")
+          .eq("room_code", roomCode);
+
+        if (lErr) {
+          console.error(lErr);
+          $("status").textContent = "صار خطأ.. جرّب مرة ثانية";
+          return;
         }
 
-        function startPolling() {
-            pollTimer = setInterval(() => {
-                let room = getRoom();
-                if (!room) return;
+        const nextNum = (list?.length || 0) + 1;
 
-                if (room.state === 'playing' && room.round) {
-                    showRole(room.round);
-                } else {
-                    document.getElementById('roleDisplay').innerHTML = '⏳ في انتظار بدء الجولة...';
-                    document.getElementById('roleDisplay').className = 'role-display';
-                    if (timerInterval) {
-                        clearInterval(timerInterval);
-                        timerInterval = null;
-                        document.getElementById('timer').textContent = '';
-                    }
-                }
-            }, 1500);
+        const { error: iErr } = await supabase
+          .from("players")
+          .insert([{ room_code: roomCode, player_uid: playerUid, player_num: nextNum }]);
+
+        if (!iErr) {
+          playerNum = nextNum;
+          break;
         }
 
-        function showRole(round) {
-            const display = document.getElementById('roleDisplay');
-            if (round.spyId === playerId) {
-                display.innerHTML = '🕵️<br>أنت الجاسوس';
-                display.className = 'role-display role-spy';
-            } else {
-                display.innerHTML = `الكلمة السرية:<div class="word">${round.word}</div>`;
-                display.className = 'role-display role-normal';
-            }
+        // unique violation on player_num or (room_code, player_uid) -> retry
+        if (iErr.code === "23505") continue;
 
-            if (round.startTime && !timerInterval) {
-                startTimer(round.startTime);
-            }
+        console.error(iErr);
+        $("status").textContent = "فشل الانضمام.. جرّب مرة ثانية";
+        return;
+      }
+
+      if (!playerNum) {
+        $("status").textContent = "الانضمام تأخر بسبب ضغط.. جرّب مرة ثانية";
+        return;
+      }
+
+      sessionStorage.setItem("spy_room_code", roomCode);
+      sessionStorage.setItem("spy_player_num", String(playerNum));
+
+      showGameScreen();
+      startPolling();
+    }
+
+    function showGameScreen(){
+      $("joinScreen").classList.add("hidden");
+      $("gameScreen").classList.remove("hidden");
+      $("playerLabel").textContent = `أنت: لاعب ${toArabicDigits(playerNum)}`;
+    }
+
+    function toArabicDigits(num){
+      const ar = ['٠','١','٢','٣','٤','٥','٦','٧','٨','٩'];
+      return String(num).split('').map(d => ar[parseInt(d,10)] ?? d).join('');
+    }
+
+    function clearTimer(){
+      if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+      $("timer").textContent = "";
+      cachedRoundStart = null;
+    }
+
+    function startTimer(isoStart){
+      cachedRoundStart = isoStart;
+      const startTime = new Date(isoStart).getTime();
+      const duration = 5 * 60; // 5 minutes
+
+      timerInterval = setInterval(() => {
+        const elapsed = Math.floor((Date.now() - startTime) / 1000);
+        const remaining = Math.max(0, duration - elapsed);
+        const mins = Math.floor(remaining / 60);
+        const secs = remaining % 60;
+        $("timer").textContent = remaining > 0
+          ? `${toArabicDigits(mins)}:${toArabicDigits(String(secs).padStart(2,'0'))}`
+          : "⏰ انتهى الوقت";
+      }, 1000);
+    }
+
+    function showWaiting(){
+      $("roleBox").className = "role waiting";
+      $("roleBox").innerHTML = "⏳ في انتظار بدء الجولة...";
+      clearTimer();
+    }
+
+    function showSpy(){
+      $("roleBox").className = "role spy";
+      $("roleBox").innerHTML = "🕵️<br>أنت الجاسوس";
+    }
+
+    function showWord(wordText){
+      $("roleBox").className = "role normal";
+      $("roleBox").innerHTML = `الكلمة السرية:<div class="word">${wordText}</div>`;
+    }
+
+    async function startPolling(){
+      if (pollTimer) clearInterval(pollTimer);
+
+      pollTimer = setInterval(async () => {
+        // Fetch room + joined word text
+        const { data: room, error } = await supabase
+          .from("rooms")
+          .select("state, spy_player_uid, round_started_at, word:words(text)")
+          .eq("code", roomCode)
+          .single();
+
+        if (error || !room) return;
+
+        if (room.state !== "playing") {
+          showWaiting();
+          return;
         }
 
-        function startTimer(startTime) {
-            const duration = 5 * 60;
-            timerInterval = setInterval(() => {
-                const elapsed = Math.floor((Date.now() - startTime) / 1000);
-                const remaining = Math.max(0, duration - elapsed);
-                const mins = Math.floor(remaining / 60);
-                const secs = remaining % 60;
-                document.getElementById('timer').textContent = 
-                    remaining > 0 ? `${toArabic(mins)}:${toArabic(secs.toString().padStart(2, '0'))}` : '⏰ انتهى الوقت';
-            }, 1000);
+        // playing
+        if (room.spy_player_uid === playerUid) {
+          showSpy();
+        } else {
+          const w = room.word && room.word.text ? room.word.text : "—";
+          showWord(w);
         }
 
-        function getRoom() {
-            return JSON.parse(localStorage.getItem(STORAGE_KEY + roomCode));
+        if (room.round_started_at && (!cachedRoundStart || cachedRoundStart !== room.round_started_at)) {
+          clearTimer();
+          startTimer(room.round_started_at);
         }
 
-        function saveRoom(room) {
-            localStorage.setItem(STORAGE_KEY + roomCode, JSON.stringify(room));
-        }
+      }, 1100);
+    }
 
-        function toArabic(num) {
-            const ar = ['٠','١','٢','٣','٤','٥','٦','٧','٨','٩'];
-            return num.toString().split('').map(d => ar[d] || d).join('');
-        }
+    window.onload = () => {
+      const savedRoom = sessionStorage.getItem("spy_room_code");
+      const savedNum = sessionStorage.getItem("spy_player_num");
+      const uid = localStorage.getItem("spy_player_uid");
 
-        window.onload = () => {
-            roomCode = sessionStorage.getItem('roomCode');
-            playerNum = sessionStorage.getItem('playerNum');
-            playerId = localStorage.getItem('playerId');
-            if (roomCode && playerNum) {
-                showGameScreen();
-                startPolling();
-            }
-        };
-    </script>
+      if (savedRoom && savedNum && uid) {
+        roomCode = savedRoom;
+        playerNum = parseInt(savedNum, 10);
+        playerUid = uid;
+        showGameScreen();
+        startPolling();
+      }
+    };
+
+    window.addEventListener("beforeunload", () => {
+      if (pollTimer) clearInterval(pollTimer);
+      if (timerInterval) clearInterval(timerInterval);
+    });
+  </script>
 </body>
 </html>
