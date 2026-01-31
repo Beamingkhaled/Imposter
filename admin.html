@@ -120,9 +120,9 @@
     <div id="loginScreen">
       <div class="row">
         <label>Admin Password</label>
-        <input id="adminPass" type="password" placeholder="Enter password" />
+        <input id="adminPass" type="password" placeholder="Enter password" onkeypress="if(event.key==='Enter') doLogin()" />
       </div>
-      <button id="loginBtn">Login</button>
+      <button onclick="doLogin()">Login</button>
       <div class="small">Password: admin123</div>
       <div id="loginError" class="error"></div>
     </div>
@@ -133,7 +133,7 @@
           <label>Room Code</label>
           <input id="roomCodeInput" type="tel" placeholder="Auto-generated (4 digits)" readonly />
         </div>
-        <button id="createRoomBtn" class="btn-success">Create Room (Generate 4 digits)</button>
+        <button onclick="createRoom()" class="btn-success">Create Room (Generate 4 digits)</button>
         <div id="setupErr" class="error"></div>
       </div>
     </div>
@@ -153,9 +153,9 @@
           <div id="playersList"></div>
         </div>
 
-        <button id="startBtn" class="btn-success">Start Round</button>
-        <button id="resetBtn" class="btn-secondary">New Round (Reset)</button>
-        <button id="closeBtn">Close Room</button>
+        <button onclick="startRound()" class="btn-success">Start Round</button>
+        <button onclick="resetRound()" class="btn-secondary">New Round (Reset)</button>
+        <button onclick="closeRoom()">Close Room</button>
 
         <div id="controlErr" class="error"></div>
       </div>
@@ -171,7 +171,15 @@
     // ======== SUPABASE CONFIG ========
     const SUPABASE_URL = "https://cpegnfupiqdgmqsguyed.supabase.co";
     const SUPABASE_ANON_KEY = "sb_publishable_WKaLUCc9WeXbEcgDfMf1KQ_NKYoTVuU";
-    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    let supabase;
+
+    // Initialize Supabase
+    try {
+      supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    } catch(e) {
+      console.error("Supabase init error:", e);
+      alert("Failed to connect to database. Check your internet connection.");
+    }
 
     // ======== ADMIN PASSWORD ========
     const ADMIN_PASSWORD = "admin123";
@@ -196,42 +204,35 @@
     const playersList = document.getElementById("playersList");
     const playerCount = document.getElementById("playerCount");
 
-    document.getElementById("loginBtn").addEventListener("click", () => {
+    // ======== LOGIN ========
+    function doLogin() {
       loginError.textContent = "";
       const pass = document.getElementById("adminPass").value;
-      console.log("Entered password:", pass);
-      console.log("Expected password:", ADMIN_PASSWORD);
       
       if (pass !== ADMIN_PASSWORD) {
-        loginError.textContent = "Wrong password. Try: admin123";
+        loginError.textContent = "Wrong password";
         return;
       }
       
       loginScreen.classList.add("hidden");
       setupScreen.classList.remove("hidden");
-    });
+    }
 
-    document.getElementById("createRoomBtn").addEventListener("click", async () => {
+    // ======== CREATE ROOM ========
+    async function createRoom() {
       setupErr.textContent = "";
       try {
-        console.log("Creating room...");
-        console.log("Supabase URL:", SUPABASE_URL);
-        console.log("Supabase Key:", SUPABASE_ANON_KEY);
+        if (!supabase) throw new Error("Database not connected");
         
         roomCode = await generateUnique4DigitCode();
         roomCodeInput.value = roomCode;
 
-        // create room row
         const { error } = await supabase
           .from("rooms")
           .insert([{ code: roomCode, status: "open", state: "waiting" }]);
 
-        if (error) {
-          console.error("Supabase error:", error);
-          throw error;
-        }
+        if (error) throw error;
 
-        // show control
         setupScreen.classList.add("hidden");
         controlScreen.classList.remove("hidden");
         roomCodeBig.textContent = roomCode;
@@ -239,12 +240,13 @@
         startPolling();
 
       } catch (e) {
-        console.error("Full error:", e);
+        console.error(e);
         setupErr.textContent = e?.message || "Failed creating room";
       }
-    });
+    }
 
-    document.getElementById("startBtn").addEventListener("click", async () => {
+    // ======== START ROUND ========
+    async function startRound() {
       controlErr.textContent = "";
       try {
         const players = await fetchPlayers();
@@ -253,7 +255,6 @@
           return;
         }
 
-        // fetch all words once, pick random client-side
         const { data: words, error: werr } = await supabase
           .from("words")
           .select("text");
@@ -262,7 +263,6 @@
         if (!words || words.length === 0) throw new Error("No words found in table 'words'");
 
         const randomWord = words[Math.floor(Math.random() * words.length)].text;
-
         const spy = players[Math.floor(Math.random() * players.length)].player_id;
 
         const { error } = await supabase
@@ -281,9 +281,10 @@
         console.error(e);
         controlErr.textContent = e?.message || "Failed starting round";
       }
-    });
+    }
 
-    document.getElementById("resetBtn").addEventListener("click", async () => {
+    // ======== RESET ROUND ========
+    async function resetRound() {
       if (!confirm("Reset the round?")) return;
       controlErr.textContent = "";
       try {
@@ -303,14 +304,14 @@
         console.error(e);
         controlErr.textContent = e?.message || "Failed reset";
       }
-    });
+    }
 
-    document.getElementById("closeBtn").addEventListener("click", async () => {
+    // ======== CLOSE ROOM ========
+    async function closeRoom() {
       if (!confirm("Close this room?")) return;
       controlErr.textContent = "";
       try {
         await supabase.from("rooms").update({ status: "closed" }).eq("code", roomCode);
-        // optional: remove players
         await supabase.from("players").delete().eq("room_code", roomCode);
 
         if (pollTimer) clearInterval(pollTimer);
@@ -320,8 +321,9 @@
         console.error(e);
         controlErr.textContent = e?.message || "Failed closing room";
       }
-    });
+    }
 
+    // ======== POLLING ========
     async function startPolling() {
       if (pollTimer) clearInterval(pollTimer);
       pollTimer = setInterval(async () => {
@@ -373,7 +375,6 @@
     }
 
     async function generateUnique4DigitCode() {
-      // Try multiple times to avoid collisions
       for (let i = 0; i < 50; i++) {
         const code = String(Math.floor(1000 + Math.random() * 9000));
         const { data, error } = await supabase
@@ -383,8 +384,8 @@
           .maybeSingle();
 
         if (error) throw error;
-        if (!data) return code;            // unused
-        if (data.status === "closed") return code; // reuse if closed
+        if (!data) return code;
+        if (data.status === "closed") return code;
       }
       throw new Error("Could not generate unique room code. Try again.");
     }
