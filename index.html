@@ -10,7 +10,13 @@
     * { margin:0; padding:0; box-sizing:border-box; }
     body{
       font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      background: repeating-linear-gradient(
+        45deg,
+        #000,
+        #000 10px,
+        #fff 10px,
+        #fff 20px
+      );
       min-height:100vh;
       display:flex;
       align-items:center;
@@ -19,18 +25,25 @@
     }
     .container{
       background:#fff;
+      border:5px solid #000;
       border-radius:18px;
       padding:26px;
       max-width:420px;
       width:100%;
-      box-shadow:0 10px 40px rgba(0,0,0,.25);
+      box-shadow:0 10px 40px rgba(0,0,0,.5);
       text-align:center;
     }
     h1{
-      color:#667eea;
+      color:#000;
       margin-bottom:16px;
       font-size:26px;
       font-weight:900;
+      text-decoration: underline;
+    }
+    h2{
+      color:#000;
+      margin:16px 0;
+      font-size:20px;
     }
     label{
       display:block;
@@ -42,7 +55,7 @@
     input{
       width:100%;
       padding:14px;
-      border:2px solid #ddd;
+      border:3px solid #000;
       border-radius:12px;
       font-size:18px;
       font-weight:900;
@@ -51,16 +64,21 @@
     button{
       width:100%;
       padding:16px;
-      border:none;
+      border:3px solid #000;
       border-radius:12px;
       margin-top:12px;
       font-size:18px;
       font-weight:900;
       cursor:pointer;
       color:#fff;
-      background:#667eea;
+      background:#000;
     }
-    button:hover{ background:#5568d3; }
+    button:hover{ background:#333; }
+    .btn-white{
+      background:#fff;
+      color:#000;
+    }
+    .btn-white:hover{ background:#eee; }
 
     .status{
       margin-top:10px;
@@ -75,10 +93,18 @@
       display:inline-block;
       padding:8px 12px;
       border-radius:999px;
-      background:#f1f1ff;
-      color:#333;
+      background:#000;
+      color:#fff;
       font-weight:900;
       margin-bottom:12px;
+    }
+
+    .code{
+      font-size:60px;
+      font-weight:900;
+      color:#000;
+      margin:20px 0;
+      letter-spacing:5px;
     }
 
     .roleBox{
@@ -92,49 +118,123 @@
       align-items:center;
       font-weight:900;
       font-size:22px;
+      border:5px solid #000;
     }
     .normal{
-      background:#d4edda;
-      color:#155724;
-      border:3px solid #28a745;
+      background:#fff;
+      color:#000;
     }
     .spy{
-      background:#f8d7da;
-      color:#721c24;
-      border:3px solid #dc3545;
+      background:#000;
+      color:#fff;
       font-size:28px;
+    }
+    .waiting{
+      background:#f0f0f0;
+      color:#666;
     }
     .word{
       margin-top:10px;
       font-size:34px;
-      color:#155724;
+      color:#000;
     }
     .timer{
       margin-top:14px;
       font-weight:900;
       font-size:40px;
-      color:#764ba2;
+      color:#000;
       min-height:46px;
+    }
+    .players{
+      margin:15px 0;
+      text-align:left;
+    }
+    .player{
+      background:#f5f5f5;
+      border:2px solid #000;
+      padding:10px;
+      margin:8px 0;
+      border-radius:8px;
+      font-weight:800;
+    }
+    .host-badge{
+      background:#000;
+      color:#fff;
+      padding:3px 8px;
+      border-radius:5px;
+      font-size:12px;
+      margin-left:8px;
     }
   </style>
 </head>
 
 <body>
   <div class="container">
-    <h1>🕵️ Imposter Game</h1>
+    <h1>🕵️ IMPOSTER GAME</h1>
+    <p style="font-size:12px; margin-bottom:15px;">BLACK & WHITE VERSION</p>
 
-    <div id="joinScreen">
+    <!-- MENU SCREEN -->
+    <div id="menuScreen">
+      <button onclick="showCreate()">CREATE ROOM (Be Host)</button>
+      <button onclick="showJoin()" class="btn-white">JOIN ROOM</button>
+      <div class="status" id="menuStatus"></div>
+    </div>
+
+    <!-- CREATE SCREEN -->
+    <div id="createScreen" class="hidden">
+      <h2>Create Room</h2>
+      <button onclick="createRoom()">GENERATE ROOM CODE</button>
+      <button onclick="backToMenu()" class="btn-white">Back</button>
+      <div class="status" id="createStatus"></div>
+    </div>
+
+    <!-- JOIN SCREEN -->
+    <div id="joinScreen" class="hidden">
+      <h2>Join Room</h2>
       <label>Room Code (4 digits)</label>
       <input id="roomCode" type="tel" maxlength="4" placeholder="1234" />
-      <button id="joinBtn">Join</button>
+      <button onclick="joinRoom()">JOIN</button>
+      <button onclick="backToMenu()" class="btn-white">Back</button>
       <div class="status" id="joinStatus"></div>
     </div>
 
+    <!-- LOBBY SCREEN (for host) -->
+    <div id="lobbyScreen" class="hidden">
+      <div class="pill">HOST</div>
+      <h2>Room Code:</h2>
+      <div class="code" id="lobbyCode">0000</div>
+      
+      <div class="players">
+        <div style="font-weight:900; margin-bottom:10px;">Players (<span id="lobbyCount">0</span>):</div>
+        <div id="lobbyList"></div>
+      </div>
+
+      <button onclick="startGame()">START GAME</button>
+      <button onclick="closeRoom()" class="btn-white">CLOSE ROOM</button>
+      <div class="status" id="lobbyStatus"></div>
+    </div>
+
+    <!-- WAITING SCREEN (for players) -->
+    <div id="waitingScreen" class="hidden">
+      <div class="pill" id="playerLabel">Player</div>
+      <div class="roleBox waiting">
+        <div>Waiting for host to start...</div>
+      </div>
+      <div class="status" id="waitStatus"></div>
+    </div>
+
+    <!-- GAME SCREEN -->
     <div id="gameScreen" class="hidden">
-      <div class="pill" id="meLabel">Player</div>
-      <div class="roleBox" id="roleBox">Waiting for host to start…</div>
+      <div class="pill" id="gameLabel">Player</div>
+      <div class="roleBox" id="roleBox">Loading...</div>
       <div class="timer" id="timer"></div>
       <div class="status" id="gameStatus"></div>
+      
+      <!-- Host controls during game -->
+      <div id="hostControls" class="hidden">
+        <button onclick="endRound()" style="margin-top:20px;">END ROUND</button>
+        <button onclick="newRound()" class="btn-white">NEW ROUND</button>
+      </div>
     </div>
   </div>
 
@@ -142,200 +242,355 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <script>
-    // ======== SUPABASE CONFIG ========
     const SUPABASE_URL = "https://cpegnfupiqdgmqsguyed.supabase.co";
     const SUPABASE_ANON_KEY = "sb_publishable_WKaLUCc9WeXbEcgDfMf1KQ_NKYoTVuU";
     const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    // ======== STATE ========
+    // STATE
     let roomCode = null;
     let playerId = null;
     let playerNum = null;
-
+    let isHost = false;
     let pollTimer = null;
     let timerInterval = null;
-    let startedAtSeen = null;
 
-    const joinScreen = document.getElementById("joinScreen");
-    const gameScreen = document.getElementById("gameScreen");
-    const joinStatus = document.getElementById("joinStatus");
+    // SCREENS
+    const screens = {
+      menu: document.getElementById("menuScreen"),
+      create: document.getElementById("createScreen"),
+      join: document.getElementById("joinScreen"),
+      lobby: document.getElementById("lobbyScreen"),
+      waiting: document.getElementById("waitingScreen"),
+      game: document.getElementById("gameScreen")
+    };
 
-    const meLabel = document.getElementById("meLabel");
-    const roleBox = document.getElementById("roleBox");
-    const timerEl = document.getElementById("timer");
-    const gameStatus = document.getElementById("gameStatus");
+    function hideAll() {
+      Object.values(screens).forEach(s => s.classList.add("hidden"));
+    }
 
-    document.getElementById("joinBtn").addEventListener("click", joinRoom);
+    function show(screen) {
+      hideAll();
+      screens[screen].classList.remove("hidden");
+    }
 
-    // ======== JOIN ========
-    async function joinRoom() {
-      joinStatus.textContent = "";
+    function backToMenu() {
+      if (pollTimer) clearInterval(pollTimer);
+      hideAll();
+      show("menu");
+    }
+
+    function showCreate() {
+      hideAll();
+      show("create");
+    }
+
+    function showJoin() {
+      hideAll();
+      show("join");
+    }
+
+    // CREATE ROOM
+    async function createRoom() {
+      document.getElementById("createStatus").textContent = "";
       try {
-        roomCode = document.getElementById("roomCode").value.trim();
-        if (!/^\d{4}$/.test(roomCode)) {
-          joinStatus.textContent = "Enter a valid 4-digit code";
-          return;
-        }
-
-        // Create a playerId for THIS session (works in anonymous too)
+        // Generate player ID
         playerId = sessionStorage.getItem("playerId") || ("p_" + cryptoRandom());
         sessionStorage.setItem("playerId", playerId);
 
-        // Check room exists & open
-        const { data: room, error: rerr } = await supabase
+        // Generate room code
+        roomCode = String(Math.floor(1000 + Math.random() * 9000));
+        
+        // Create room
+        const { error: roomErr } = await supabase
+          .from("rooms")
+          .insert([{ 
+            code: roomCode, 
+            status: "open", 
+            state: "waiting",
+            host_player_id: playerId
+          }]);
+
+        if (roomErr) throw roomErr;
+
+        // Add host as player 1
+        const { error: playerErr } = await supabase
+          .from("players")
+          .insert([{ 
+            room_code: roomCode, 
+            player_id: playerId, 
+            player_num: 1 
+          }]);
+
+        if (playerErr) throw playerErr;
+
+        playerNum = 1;
+        isHost = true;
+
+        sessionStorage.setItem("roomCode", roomCode);
+        sessionStorage.setItem("playerNum", "1");
+        sessionStorage.setItem("isHost", "true");
+
+        document.getElementById("lobbyCode").textContent = roomCode;
+        show("lobby");
+        startPolling();
+
+      } catch (e) {
+        console.error(e);
+        document.getElementById("createStatus").textContent = e.message;
+      }
+    }
+
+    // JOIN ROOM
+    async function joinRoom() {
+      document.getElementById("joinStatus").textContent = "";
+      try {
+        roomCode = document.getElementById("roomCode").value.trim();
+        if (!/^\d{4}$/.test(roomCode)) {
+          document.getElementById("joinStatus").textContent = "Enter valid 4-digit code";
+          return;
+        }
+
+        // Generate player ID
+        playerId = sessionStorage.getItem("playerId") || ("p_" + cryptoRandom());
+        sessionStorage.setItem("playerId", playerId);
+
+        // Check room exists
+        const { data: room, error: roomErr } = await supabase
           .from("rooms")
           .select("*")
           .eq("code", roomCode)
           .maybeSingle();
 
-        if (rerr) throw rerr;
+        if (roomErr) throw roomErr;
         if (!room) {
-          joinStatus.textContent = "Room not found.";
+          document.getElementById("joinStatus").textContent = "Room not found";
           return;
         }
         if (room.status !== "open") {
-          joinStatus.textContent = "Room is closed.";
+          document.getElementById("joinStatus").textContent = "Room is closed";
           return;
         }
 
-        // If already joined, get player_num
-        const { data: existing, error: exErr } = await supabase
+        // Check if already joined
+        const { data: existing } = await supabase
           .from("players")
           .select("player_num")
           .eq("room_code", roomCode)
           .eq("player_id", playerId)
           .maybeSingle();
 
-        if (exErr) throw exErr;
-
-        if (existing?.player_num) {
+        if (existing) {
           playerNum = existing.player_num;
         } else {
-          // assign next number
-          const { data: plist, error: perr } = await supabase
+          // Get next player number
+          const { data: players } = await supabase
             .from("players")
             .select("player_num")
             .eq("room_code", roomCode);
 
-          if (perr) throw perr;
+          const used = new Set((players || []).map(p => p.player_num));
+          let nextNum = 1;
+          while (used.has(nextNum)) nextNum++;
 
-          const used = new Set((plist || []).map(x => x.player_num));
-          let assign = 1;
-          while (used.has(assign)) assign++;
-
-          const { error: insErr } = await supabase
+          // Add player
+          const { error: addErr } = await supabase
             .from("players")
-            .insert([{ room_code: roomCode, player_id: playerId, player_num: assign }]);
+            .insert([{ 
+              room_code: roomCode, 
+              player_id: playerId, 
+              player_num: nextNum 
+            }]);
 
-          if (insErr) throw insErr;
-
-          playerNum = assign;
+          if (addErr) throw addErr;
+          playerNum = nextNum;
         }
 
+        isHost = false;
         sessionStorage.setItem("roomCode", roomCode);
         sessionStorage.setItem("playerNum", String(playerNum));
+        sessionStorage.setItem("isHost", "false");
 
-        showGame();
+        document.getElementById("playerLabel").textContent = `Player ${playerNum}`;
+        show("waiting");
         startPolling();
 
       } catch (e) {
         console.error(e);
-        joinStatus.textContent = e?.message || "Join failed.";
+        document.getElementById("joinStatus").textContent = e.message;
       }
     }
 
-    function showGame() {
-      joinScreen.classList.add("hidden");
-      gameScreen.classList.remove("hidden");
-      meLabel.textContent = `You are Player ${playerNum}`;
-      roleBox.className = "roleBox";
-      roleBox.textContent = "Waiting for host to start…";
-      timerEl.textContent = "";
-      gameStatus.textContent = "";
+    // START GAME (host only)
+    async function startGame() {
+      document.getElementById("lobbyStatus").textContent = "";
+      try {
+        const { data: players } = await supabase
+          .from("players")
+          .select("player_id")
+          .eq("room_code", roomCode);
+
+        if (!players || players.length < 2) {
+          document.getElementById("lobbyStatus").textContent = "Need at least 2 players";
+          return;
+        }
+
+        // Get random word
+        const { data: words } = await supabase.from("words").select("text");
+        if (!words || words.length === 0) throw new Error("No words in database");
+        const word = words[Math.floor(Math.random() * words.length)].text;
+
+        // Determine number of imposters (2 if 5+ players, else 1)
+        const imposterCount = players.length >= 5 ? 2 : 1;
+        
+        // Shuffle and pick imposters
+        const shuffled = [...players].sort(() => Math.random() - 0.5);
+        const imposters = shuffled.slice(0, imposterCount).map(p => p.player_id);
+
+        // Update room
+        await supabase.from("rooms").update({
+          state: "playing",
+          word: word,
+          spy_player_id: imposters[0], // primary imposter for backwards compatibility
+          imposters: imposters, // array of all imposters
+          started_at: new Date().toISOString()
+        }).eq("code", roomCode);
+
+      } catch (e) {
+        console.error(e);
+        document.getElementById("lobbyStatus").textContent = e.message;
+      }
     }
 
-    // ======== POLL ROOM STATE ========
+    // END ROUND (host only)
+    async function endRound() {
+      if (!confirm("End this round?")) return;
+      await supabase.from("rooms").update({
+        state: "ended"
+      }).eq("code", roomCode);
+    }
+
+    // NEW ROUND (host only)
+    async function newRound() {
+      if (!confirm("Start a new round?")) return;
+      await supabase.from("rooms").update({
+        state: "waiting",
+        word: null,
+        spy_player_id: null,
+        imposters: null,
+        started_at: null
+      }).eq("code", roomCode);
+    }
+
+    // CLOSE ROOM (host only)
+    async function closeRoom() {
+      if (!confirm("Close this room?")) return;
+      await supabase.from("rooms").update({ status: "closed" }).eq("code", roomCode);
+      await supabase.from("players").delete().eq("room_code", roomCode);
+      if (pollTimer) clearInterval(pollTimer);
+      backToMenu();
+    }
+
+    // POLLING
     function startPolling() {
       if (pollTimer) clearInterval(pollTimer);
-
+      
       pollTimer = setInterval(async () => {
         try {
-          const { data: room, error } = await supabase
+          const { data: room } = await supabase
             .from("rooms")
             .select("*")
             .eq("code", roomCode)
             .maybeSingle();
 
-          if (error) throw error;
-          if (!room) return;
-
-          if (room.status !== "open") {
-            roleBox.className = "roleBox";
-            roleBox.textContent = "Room closed.";
-            gameStatus.textContent = "";
-            stopTimer();
+          if (!room || room.status !== "open") {
+            if (pollTimer) clearInterval(pollTimer);
+            alert("Room closed");
+            backToMenu();
             return;
           }
 
+          // Update lobby if host
+          if (isHost && room.state === "waiting") {
+            const { data: players } = await supabase
+              .from("players")
+              .select("player_num, player_id")
+              .eq("room_code", roomCode)
+              .order("player_num");
+
+            document.getElementById("lobbyCount").textContent = players.length;
+            document.getElementById("lobbyList").innerHTML = players
+              .map(p => `<div class="player">Player ${p.player_num}${p.player_id === playerId ? '<span class="host-badge">HOST</span>' : ''}</div>`)
+              .join("");
+          }
+
+          // Game started
           if (room.state === "playing" && room.started_at) {
-            showRole(room);
-            if (startedAtSeen !== room.started_at) {
-              startedAtSeen = room.started_at;
-              startTimer(new Date(room.started_at).getTime());
+            showGameScreen(room);
+          }
+
+          // Game ended
+          if (room.state === "ended") {
+            if (isHost) {
+              show("lobby");
+              document.getElementById("lobbyStatus").textContent = "Round ended. Start new round or close room.";
+            } else {
+              show("waiting");
+              document.getElementById("waitStatus").textContent = "Round ended. Waiting for host...";
             }
-          } else {
-            roleBox.className = "roleBox";
-            roleBox.textContent = "Waiting for host to start…";
-            gameStatus.textContent = "";
-            stopTimer();
           }
 
         } catch (e) {
-          console.error("poll error", e);
+          console.error("Poll error:", e);
         }
-      }, 1200);
+      }, 1500);
     }
 
-    function showRole(room) {
-      if (room.spy_player_id === playerId) {
+    function showGameScreen(room) {
+      hideAll();
+      show("game");
+
+      const imposters = room.imposters || [room.spy_player_id];
+      const isImposter = imposters.includes(playerId);
+
+      document.getElementById("gameLabel").textContent = `Player ${playerNum}`;
+      
+      const roleBox = document.getElementById("roleBox");
+      if (isImposter) {
         roleBox.className = "roleBox spy";
         roleBox.innerHTML = "🕵️ YOU ARE THE IMPOSTER";
-        gameStatus.textContent = "Don't get caught.";
+        document.getElementById("gameStatus").textContent = "Don't get caught!";
       } else {
         roleBox.className = "roleBox normal";
-        roleBox.innerHTML = `SECRET WORD:<div class="word">${escapeHtml(room.word || "")}</div>`;
-        gameStatus.textContent = "Blend in.";
+        roleBox.innerHTML = `SECRET WORD:<div class="word">${escapeHtml(room.word)}</div>`;
+        document.getElementById("gameStatus").textContent = "Find the imposter!";
       }
+
+      // Show host controls
+      if (isHost) {
+        document.getElementById("hostControls").classList.remove("hidden");
+      }
+
+      // Start timer
+      const startMs = new Date(room.started_at).getTime();
+      startTimer(startMs);
     }
 
-    // ======== TIMER (5 minutes) ========
     function startTimer(startMs) {
-      stopTimer();
-      const duration = 5 * 60; // seconds
+      if (timerInterval) clearInterval(timerInterval);
+      const duration = 5 * 60;
 
       timerInterval = setInterval(() => {
         const elapsed = Math.floor((Date.now() - startMs) / 1000);
         const remaining = Math.max(0, duration - elapsed);
         const mins = Math.floor(remaining / 60);
         const secs = remaining % 60;
-        timerEl.textContent = remaining > 0
+        document.getElementById("timer").textContent = remaining > 0
           ? `${mins}:${String(secs).padStart(2, "0")}`
           : "TIME UP ⏰";
       }, 500);
     }
 
-    function stopTimer() {
-      if (timerInterval) {
-        clearInterval(timerInterval);
-        timerInterval = null;
-      }
-      timerEl.textContent = "";
-      startedAtSeen = null;
-    }
-
-    // ======== UTIL ========
     function cryptoRandom() {
-      // short random string
       const arr = new Uint8Array(16);
       crypto.getRandomValues(arr);
       return Array.from(arr).map(b => b.toString(16).padStart(2,"0")).join("");
@@ -347,23 +602,35 @@
       }[m]));
     }
 
-    // ======== AUTO RESUME (same tab session) ========
+    // Auto-resume session
     window.addEventListener("load", () => {
-      const savedRoom = sessionStorage.getItem("roomCode");
-      const savedNum = sessionStorage.getItem("playerNum");
-      const savedPid = sessionStorage.getItem("playerId");
-      if (savedRoom && savedNum && savedPid) {
-        roomCode = savedRoom;
-        playerNum = parseInt(savedNum, 10);
-        playerId = savedPid;
-        showGame();
+      const saved = {
+        code: sessionStorage.getItem("roomCode"),
+        num: sessionStorage.getItem("playerNum"),
+        pid: sessionStorage.getItem("playerId"),
+        host: sessionStorage.getItem("isHost") === "true"
+      };
+
+      if (saved.code && saved.num && saved.pid) {
+        roomCode = saved.code;
+        playerNum = parseInt(saved.num);
+        playerId = saved.pid;
+        isHost = saved.host;
+
+        if (isHost) {
+          document.getElementById("lobbyCode").textContent = roomCode;
+          show("lobby");
+        } else {
+          document.getElementById("playerLabel").textContent = `Player ${playerNum}`;
+          show("waiting");
+        }
         startPolling();
       }
     });
 
     window.addEventListener("beforeunload", () => {
       if (pollTimer) clearInterval(pollTimer);
-      stopTimer();
+      if (timerInterval) clearInterval(timerInterval);
     });
   </script>
 </body>
