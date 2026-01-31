@@ -142,7 +142,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <script>
-    // ======== YOUR SUPABASE CONFIG (already filled) ========
+    // ======== SUPABASE CONFIG ========
     const SUPABASE_URL = "https://cpegnfupiqdgmqsguyed.supabase.co";
     const SUPABASE_ANON_KEY = "sb_publishable_WKaLUCc9WeXbEcgDfMf1KQ_NKYoTVuU";
     const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -173,7 +173,8 @@
       try {
         roomCode = document.getElementById("roomCode").value.trim();
         if (!/^\d{4}$/.test(roomCode)) {
-          return alert("Enter a valid 4-digit code");
+          joinStatus.textContent = "Enter a valid 4-digit code";
+          return;
         }
 
         // Create a playerId for THIS session (works in anonymous too)
@@ -211,15 +212,6 @@
           playerNum = existing.player_num;
         } else {
           // assign next number
-          const { data: countRows, error: cntErr } = await supabase
-            .from("players")
-            .select("id", { count: "exact", head: true })
-            .eq("room_code", roomCode);
-
-          if (cntErr) throw cntErr;
-
-          const nextNum = (countRows === null ? 0 : 0) + 1; // head:true returns null data, but count available in response meta
-          // Supabase JS returns count on the response object; easiest: re-query list length
           const { data: plist, error: perr } = await supabase
             .from("players")
             .select("player_num")
@@ -308,7 +300,7 @@
       if (room.spy_player_id === playerId) {
         roleBox.className = "roleBox spy";
         roleBox.innerHTML = "🕵️ YOU ARE THE IMPOSTER";
-        gameStatus.textContent = "Don’t get caught.";
+        gameStatus.textContent = "Don't get caught.";
       } else {
         roleBox.className = "roleBox normal";
         roleBox.innerHTML = `SECRET WORD:<div class="word">${escapeHtml(room.word || "")}</div>`;
