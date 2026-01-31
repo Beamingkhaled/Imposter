@@ -10,7 +10,7 @@
     * { margin:0; padding:0; box-sizing:border-box; }
     body{
       font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-      background: linear-gradient(135deg, #f9d423 0%, #ff4e50 100%);
+      background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
       min-height:100vh;
       padding:20px;
     }
@@ -25,7 +25,7 @@
     h1{
       text-align:center;
       margin-bottom:18px;
-      color:#ff4e50;
+      color:#11998e;
       font-size:28px;
     }
     .row{ margin:14px 0; }
@@ -52,19 +52,19 @@
       cursor:pointer;
       margin-top:10px;
       color:#fff;
-      background:#ff4e50;
+      background:#11998e;
     }
-    button:hover{ background:#e0414a; }
-    .btn-success{ background:#f9d423; color:#333; }
-    .btn-success:hover{ background:#e0c020; }
+    button:hover{ background:#0d7a6f; }
+    .btn-success{ background:#38ef7d; color:#333; }
+    .btn-success:hover{ background:#2dd66b; }
     .btn-secondary{ background:#6c757d; }
     .btn-secondary:hover{ background:#5a6268; }
 
-    .hidden{ display:none; }
+    .hidden{ display:none !important; }
 
     .card{
-      background:#fffef7;
-      border:2px solid #f9d423;
+      background:#f0fff4;
+      border:2px solid #38ef7d;
       padding:14px;
       border-radius:14px;
       margin-top:14px;
@@ -74,7 +74,7 @@
       font-size:54px;
       letter-spacing:3px;
       font-weight:900;
-      color:#ff4e50;
+      color:#11998e;
       margin:10px 0 4px;
     }
     .status{
@@ -115,14 +115,14 @@
 
 <body>
   <div class="container">
-    <h1>👑 Admin Panel (YELLOW)</h1>
+    <h1>👑 Admin Panel (GREEN)</h1>
 
     <div id="loginScreen">
       <div class="row">
         <label>Admin Password</label>
-        <input id="adminPass" type="text" placeholder="Enter password" value="admin123" />
+        <input id="adminPass" type="text" value="admin123" />
       </div>
-      <button onclick="alert('Button clicked!'); doLogin();">Login</button>
+      <button onclick="doLogin()">Login</button>
       <div class="small">Password is pre-filled: admin123</div>
       <div id="loginError" class="error"></div>
     </div>
@@ -160,7 +160,7 @@
         <div id="controlErr" class="error"></div>
       </div>
 
-      <div class="small">If your changes "don't show", hard refresh.</div>
+      <div class="small">GREEN VERSION - Room controls</div>
     </div>
   </div>
 
@@ -168,11 +168,6 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <script>
-    // TEST: Alert on page load
-    window.addEventListener('load', function() {
-      alert('Page loaded! JavaScript is working.');
-    });
-
     // ======== SUPABASE CONFIG ========
     const SUPABASE_URL = "https://cpegnfupiqdgmqsguyed.supabase.co";
     const SUPABASE_ANON_KEY = "sb_publishable_WKaLUCc9WeXbEcgDfMf1KQ_NKYoTVuU";
@@ -181,6 +176,7 @@
     // Initialize Supabase
     try {
       supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+      console.log("Supabase connected");
     } catch(e) {
       console.error("Supabase init error:", e);
     }
@@ -192,7 +188,7 @@
     let roomCode = null;
     let pollTimer = null;
 
-    // ======== UI ========
+    // ======== UI ELEMENTS ========
     const loginScreen = document.getElementById("loginScreen");
     const setupScreen = document.getElementById("setupScreen");
     const controlScreen = document.getElementById("controlScreen");
@@ -210,21 +206,16 @@
 
     // ======== LOGIN ========
     function doLogin() {
-      alert('doLogin function called!');
-      loginError.textContent = "";
       const pass = document.getElementById("adminPass").value;
-      
-      alert('Password entered: ' + pass);
       
       if (pass !== ADMIN_PASSWORD) {
         loginError.textContent = "Wrong password";
-        alert('Password wrong!');
         return;
       }
       
-      alert('Password correct! Switching screens...');
-      loginScreen.classList.add("hidden");
-      setupScreen.classList.remove("hidden");
+      // Hide login, show setup
+      loginScreen.style.display = "none";
+      setupScreen.style.display = "block";
     }
 
     // ======== CREATE ROOM ========
@@ -242,8 +233,9 @@
 
         if (error) throw error;
 
-        setupScreen.classList.add("hidden");
-        controlScreen.classList.remove("hidden");
+        // Hide setup, show control
+        setupScreen.style.display = "none";
+        controlScreen.style.display = "block";
         roomCodeBig.textContent = roomCode;
 
         startPolling();
