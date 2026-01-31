@@ -1,272 +1,377 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
-  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-  <title>لعبة الجاسوس 🕵️</title>
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <title>Imposter Game 🕵️</title>
+
   <style>
-    *{margin:0;padding:0;box-sizing:border-box}
+    * { margin:0; padding:0; box-sizing:border-box; }
     body{
-      font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;
-      background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);
-      min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:18px;
     }
     .container{
-      background:#fff;border-radius:20px;padding:28px;max-width:420px;width:100%;
+      background:#fff;
+      border-radius:18px;
+      padding:26px;
+      max-width:420px;
+      width:100%;
       box-shadow:0 10px 40px rgba(0,0,0,.25);
+      text-align:center;
     }
-    h1{text-align:center;color:#667eea;margin-bottom:18px;font-size:28px}
-    label{display:block;margin:12px 0 8px;font-weight:800;color:#333}
+    h1{
+      color:#667eea;
+      margin-bottom:16px;
+      font-size:26px;
+      font-weight:900;
+    }
+    label{
+      display:block;
+      text-align:left;
+      font-weight:800;
+      margin:12px 0 8px;
+      color:#333;
+    }
     input{
-      width:100%;padding:14px;border:2px solid #ddd;border-radius:12px;font-size:22px;
-      text-align:center;font-weight:900
+      width:100%;
+      padding:14px;
+      border:2px solid #ddd;
+      border-radius:12px;
+      font-size:18px;
+      font-weight:900;
+      text-align:center;
     }
     button{
-      width:100%;padding:16px;margin-top:12px;border:0;border-radius:12px;
-      background:#667eea;color:#fff;font-size:20px;font-weight:900;cursor:pointer
+      width:100%;
+      padding:16px;
+      border:none;
+      border-radius:12px;
+      margin-top:12px;
+      font-size:18px;
+      font-weight:900;
+      cursor:pointer;
+      color:#fff;
+      background:#667eea;
     }
-    button:hover{opacity:.92}
-    .status{margin-top:10px;text-align:center;color:#666;font-weight:700}
-    .hidden{display:none}
-    .player-label{text-align:center;font-size:18px;color:#667eea;font-weight:900;margin:6px 0 12px}
-    .role{
-      text-align:center;padding:22px;border-radius:16px;font-weight:900;min-height:160px;
-      display:flex;flex-direction:column;align-items:center;justify-content:center
+    button:hover{ background:#5568d3; }
+
+    .status{
+      margin-top:10px;
+      font-weight:700;
+      color:#444;
+      min-height:20px;
     }
-    .role.waiting{background:#f8f9fa;color:#555;border:2px solid #eee}
-    .role.normal{background:#d4edda;color:#155724;border:3px solid #28a745}
-    .role.spy{background:#f8d7da;color:#721c24;border:3px solid #dc3545;font-size:30px}
-    .word{font-size:34px;margin-top:10px}
-    .timer{text-align:center;font-size:40px;color:#764ba2;font-weight:900;margin-top:14px}
+
+    .hidden{ display:none; }
+
+    .pill{
+      display:inline-block;
+      padding:8px 12px;
+      border-radius:999px;
+      background:#f1f1ff;
+      color:#333;
+      font-weight:900;
+      margin-bottom:12px;
+    }
+
+    .roleBox{
+      margin-top:14px;
+      padding:22px 16px;
+      border-radius:16px;
+      min-height:150px;
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+      align-items:center;
+      font-weight:900;
+      font-size:22px;
+    }
+    .normal{
+      background:#d4edda;
+      color:#155724;
+      border:3px solid #28a745;
+    }
+    .spy{
+      background:#f8d7da;
+      color:#721c24;
+      border:3px solid #dc3545;
+      font-size:28px;
+    }
+    .word{
+      margin-top:10px;
+      font-size:34px;
+      color:#155724;
+    }
+    .timer{
+      margin-top:14px;
+      font-weight:900;
+      font-size:40px;
+      color:#764ba2;
+      min-height:46px;
+    }
   </style>
 </head>
+
 <body>
   <div class="container">
-    <h1>🕵️ لعبة الجاسوس</h1>
+    <h1>🕵️ Imposter Game</h1>
 
     <div id="joinScreen">
-      <label>رمز الغرفة (٤ أرقام)</label>
-      <input id="roomCode" type="tel" inputmode="numeric" maxlength="4" placeholder="1234">
-      <button id="joinBtn">انضمام</button>
-      <div class="status" id="status"></div>
+      <label>Room Code (4 digits)</label>
+      <input id="roomCode" type="tel" maxlength="4" placeholder="1234" />
+      <button id="joinBtn">Join</button>
+      <div class="status" id="joinStatus"></div>
     </div>
 
     <div id="gameScreen" class="hidden">
-      <div class="player-label" id="playerLabel"></div>
-      <div class="role waiting" id="roleBox">⏳ في انتظار بدء الجولة...</div>
+      <div class="pill" id="meLabel">Player</div>
+      <div class="roleBox" id="roleBox">Waiting for host to start…</div>
       <div class="timer" id="timer"></div>
+      <div class="status" id="gameStatus"></div>
     </div>
   </div>
 
+  <!-- Supabase JS -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
   <script>
+    // ======== YOUR SUPABASE CONFIG (already filled) ========
     const SUPABASE_URL = "https://cpegnfupiqdgmqsguyed.supabase.co";
-    const SUPABASE_KEY = "sb_publishable_WKaLUCc9WeXbEcgDfMf1KQ_NKYoTVuU";
-    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    const SUPABASE_ANON_KEY = "sb_publishable_WKaLUCc9WeXbEcgDfMf1KQ_NKYoTVuU";
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    const $ = (id) => document.getElementById(id);
-
-    let roomCode = "";
-    let playerUid = "";
+    // ======== STATE ========
+    let roomCode = null;
+    let playerId = null;
     let playerNum = null;
 
     let pollTimer = null;
     let timerInterval = null;
-    let cachedRoundStart = null;
+    let startedAtSeen = null;
 
-    $("joinBtn").addEventListener("click", joinRoom);
+    const joinScreen = document.getElementById("joinScreen");
+    const gameScreen = document.getElementById("gameScreen");
+    const joinStatus = document.getElementById("joinStatus");
 
-    function isValid4DigitCode(code){ return /^\d{4}$/.test(code); }
+    const meLabel = document.getElementById("meLabel");
+    const roleBox = document.getElementById("roleBox");
+    const timerEl = document.getElementById("timer");
+    const gameStatus = document.getElementById("gameStatus");
 
-    function getOrCreatePlayerUid(){
-      let uid = localStorage.getItem("spy_player_uid");
-      if (!uid) {
-        uid = "p_" + Date.now() + "_" + Math.random().toString(16).slice(2);
-        localStorage.setItem("spy_player_uid", uid);
-      }
-      return uid;
-    }
+    document.getElementById("joinBtn").addEventListener("click", joinRoom);
 
-    async function joinRoom(){
-      roomCode = $("roomCode").value.trim();
-      if (!isValid4DigitCode(roomCode)) return alert("اكتب رمز ٤ أرقام بالضبط");
+    // ======== JOIN ========
+    async function joinRoom() {
+      joinStatus.textContent = "";
+      try {
+        roomCode = document.getElementById("roomCode").value.trim();
+        if (!/^\d{4}$/.test(roomCode)) {
+          return alert("Enter a valid 4-digit code");
+        }
 
-      playerUid = getOrCreatePlayerUid();
+        // Create a playerId for THIS session (works in anonymous too)
+        playerId = sessionStorage.getItem("playerId") || ("p_" + cryptoRandom());
+        sessionStorage.setItem("playerId", playerId);
 
-      // Check room exists
-      const { data: room, error: rErr } = await supabase
-        .from("rooms")
-        .select("code,state")
-        .eq("code", roomCode)
-        .single();
+        // Check room exists & open
+        const { data: room, error: rerr } = await supabase
+          .from("rooms")
+          .select("*")
+          .eq("code", roomCode)
+          .maybeSingle();
 
-      if (rErr || !room) {
-        $("status").textContent = "الغرفة غير موجودة";
-        return;
-      }
+        if (rerr) throw rerr;
+        if (!room) {
+          joinStatus.textContent = "Room not found.";
+          return;
+        }
+        if (room.status !== "open") {
+          joinStatus.textContent = "Room is closed.";
+          return;
+        }
 
-      // Ensure player row exists; assign player_num safely with retry
-      let attempts = 0;
-      while (attempts < 6) {
-        attempts++;
-
-        // If already joined, fetch your number
-        const { data: existing } = await supabase
+        // If already joined, get player_num
+        const { data: existing, error: exErr } = await supabase
           .from("players")
           .select("player_num")
           .eq("room_code", roomCode)
-          .eq("player_uid", playerUid)
+          .eq("player_id", playerId)
           .maybeSingle();
 
-        if (existing && existing.player_num) {
+        if (exErr) throw exErr;
+
+        if (existing?.player_num) {
           playerNum = existing.player_num;
-          break;
+        } else {
+          // assign next number
+          const { data: countRows, error: cntErr } = await supabase
+            .from("players")
+            .select("id", { count: "exact", head: true })
+            .eq("room_code", roomCode);
+
+          if (cntErr) throw cntErr;
+
+          const nextNum = (countRows === null ? 0 : 0) + 1; // head:true returns null data, but count available in response meta
+          // Supabase JS returns count on the response object; easiest: re-query list length
+          const { data: plist, error: perr } = await supabase
+            .from("players")
+            .select("player_num")
+            .eq("room_code", roomCode);
+
+          if (perr) throw perr;
+
+          const used = new Set((plist || []).map(x => x.player_num));
+          let assign = 1;
+          while (used.has(assign)) assign++;
+
+          const { error: insErr } = await supabase
+            .from("players")
+            .insert([{ room_code: roomCode, player_id: playerId, player_num: assign }]);
+
+          if (insErr) throw insErr;
+
+          playerNum = assign;
         }
 
-        // Count current players to suggest next number
-        const { data: list, error: lErr } = await supabase
-          .from("players")
-          .select("player_num")
-          .eq("room_code", roomCode);
+        sessionStorage.setItem("roomCode", roomCode);
+        sessionStorage.setItem("playerNum", String(playerNum));
 
-        if (lErr) {
-          console.error(lErr);
-          $("status").textContent = "صار خطأ.. جرّب مرة ثانية";
-          return;
-        }
+        showGame();
+        startPolling();
 
-        const nextNum = (list?.length || 0) + 1;
-
-        const { error: iErr } = await supabase
-          .from("players")
-          .insert([{ room_code: roomCode, player_uid: playerUid, player_num: nextNum }]);
-
-        if (!iErr) {
-          playerNum = nextNum;
-          break;
-        }
-
-        // unique violation on player_num or (room_code, player_uid) -> retry
-        if (iErr.code === "23505") continue;
-
-        console.error(iErr);
-        $("status").textContent = "فشل الانضمام.. جرّب مرة ثانية";
-        return;
+      } catch (e) {
+        console.error(e);
+        joinStatus.textContent = e?.message || "Join failed.";
       }
-
-      if (!playerNum) {
-        $("status").textContent = "الانضمام تأخر بسبب ضغط.. جرّب مرة ثانية";
-        return;
-      }
-
-      sessionStorage.setItem("spy_room_code", roomCode);
-      sessionStorage.setItem("spy_player_num", String(playerNum));
-
-      showGameScreen();
-      startPolling();
     }
 
-    function showGameScreen(){
-      $("joinScreen").classList.add("hidden");
-      $("gameScreen").classList.remove("hidden");
-      $("playerLabel").textContent = `أنت: لاعب ${toArabicDigits(playerNum)}`;
+    function showGame() {
+      joinScreen.classList.add("hidden");
+      gameScreen.classList.remove("hidden");
+      meLabel.textContent = `You are Player ${playerNum}`;
+      roleBox.className = "roleBox";
+      roleBox.textContent = "Waiting for host to start…";
+      timerEl.textContent = "";
+      gameStatus.textContent = "";
     }
 
-    function toArabicDigits(num){
-      const ar = ['٠','١','٢','٣','٤','٥','٦','٧','٨','٩'];
-      return String(num).split('').map(d => ar[parseInt(d,10)] ?? d).join('');
-    }
-
-    function clearTimer(){
-      if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
-      $("timer").textContent = "";
-      cachedRoundStart = null;
-    }
-
-    function startTimer(isoStart){
-      cachedRoundStart = isoStart;
-      const startTime = new Date(isoStart).getTime();
-      const duration = 5 * 60; // 5 minutes
-
-      timerInterval = setInterval(() => {
-        const elapsed = Math.floor((Date.now() - startTime) / 1000);
-        const remaining = Math.max(0, duration - elapsed);
-        const mins = Math.floor(remaining / 60);
-        const secs = remaining % 60;
-        $("timer").textContent = remaining > 0
-          ? `${toArabicDigits(mins)}:${toArabicDigits(String(secs).padStart(2,'0'))}`
-          : "⏰ انتهى الوقت";
-      }, 1000);
-    }
-
-    function showWaiting(){
-      $("roleBox").className = "role waiting";
-      $("roleBox").innerHTML = "⏳ في انتظار بدء الجولة...";
-      clearTimer();
-    }
-
-    function showSpy(){
-      $("roleBox").className = "role spy";
-      $("roleBox").innerHTML = "🕵️<br>أنت الجاسوس";
-    }
-
-    function showWord(wordText){
-      $("roleBox").className = "role normal";
-      $("roleBox").innerHTML = `الكلمة السرية:<div class="word">${wordText}</div>`;
-    }
-
-    async function startPolling(){
+    // ======== POLL ROOM STATE ========
+    function startPolling() {
       if (pollTimer) clearInterval(pollTimer);
 
       pollTimer = setInterval(async () => {
-        // Fetch room + joined word text
-        const { data: room, error } = await supabase
-          .from("rooms")
-          .select("state, spy_player_uid, round_started_at, word:words(text)")
-          .eq("code", roomCode)
-          .single();
+        try {
+          const { data: room, error } = await supabase
+            .from("rooms")
+            .select("*")
+            .eq("code", roomCode)
+            .maybeSingle();
 
-        if (error || !room) return;
+          if (error) throw error;
+          if (!room) return;
 
-        if (room.state !== "playing") {
-          showWaiting();
-          return;
+          if (room.status !== "open") {
+            roleBox.className = "roleBox";
+            roleBox.textContent = "Room closed.";
+            gameStatus.textContent = "";
+            stopTimer();
+            return;
+          }
+
+          if (room.state === "playing" && room.started_at) {
+            showRole(room);
+            if (startedAtSeen !== room.started_at) {
+              startedAtSeen = room.started_at;
+              startTimer(new Date(room.started_at).getTime());
+            }
+          } else {
+            roleBox.className = "roleBox";
+            roleBox.textContent = "Waiting for host to start…";
+            gameStatus.textContent = "";
+            stopTimer();
+          }
+
+        } catch (e) {
+          console.error("poll error", e);
         }
-
-        // playing
-        if (room.spy_player_uid === playerUid) {
-          showSpy();
-        } else {
-          const w = room.word && room.word.text ? room.word.text : "—";
-          showWord(w);
-        }
-
-        if (room.round_started_at && (!cachedRoundStart || cachedRoundStart !== room.round_started_at)) {
-          clearTimer();
-          startTimer(room.round_started_at);
-        }
-
-      }, 1100);
+      }, 1200);
     }
 
-    window.onload = () => {
-      const savedRoom = sessionStorage.getItem("spy_room_code");
-      const savedNum = sessionStorage.getItem("spy_player_num");
-      const uid = localStorage.getItem("spy_player_uid");
+    function showRole(room) {
+      if (room.spy_player_id === playerId) {
+        roleBox.className = "roleBox spy";
+        roleBox.innerHTML = "🕵️ YOU ARE THE IMPOSTER";
+        gameStatus.textContent = "Don’t get caught.";
+      } else {
+        roleBox.className = "roleBox normal";
+        roleBox.innerHTML = `SECRET WORD:<div class="word">${escapeHtml(room.word || "")}</div>`;
+        gameStatus.textContent = "Blend in.";
+      }
+    }
 
-      if (savedRoom && savedNum && uid) {
+    // ======== TIMER (5 minutes) ========
+    function startTimer(startMs) {
+      stopTimer();
+      const duration = 5 * 60; // seconds
+
+      timerInterval = setInterval(() => {
+        const elapsed = Math.floor((Date.now() - startMs) / 1000);
+        const remaining = Math.max(0, duration - elapsed);
+        const mins = Math.floor(remaining / 60);
+        const secs = remaining % 60;
+        timerEl.textContent = remaining > 0
+          ? `${mins}:${String(secs).padStart(2, "0")}`
+          : "TIME UP ⏰";
+      }, 500);
+    }
+
+    function stopTimer() {
+      if (timerInterval) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+      }
+      timerEl.textContent = "";
+      startedAtSeen = null;
+    }
+
+    // ======== UTIL ========
+    function cryptoRandom() {
+      // short random string
+      const arr = new Uint8Array(16);
+      crypto.getRandomValues(arr);
+      return Array.from(arr).map(b => b.toString(16).padStart(2,"0")).join("");
+    }
+
+    function escapeHtml(s) {
+      return String(s).replace(/[&<>"']/g, m => ({
+        "&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"
+      }[m]));
+    }
+
+    // ======== AUTO RESUME (same tab session) ========
+    window.addEventListener("load", () => {
+      const savedRoom = sessionStorage.getItem("roomCode");
+      const savedNum = sessionStorage.getItem("playerNum");
+      const savedPid = sessionStorage.getItem("playerId");
+      if (savedRoom && savedNum && savedPid) {
         roomCode = savedRoom;
         playerNum = parseInt(savedNum, 10);
-        playerUid = uid;
-        showGameScreen();
+        playerId = savedPid;
+        showGame();
         startPolling();
       }
-    };
+    });
 
     window.addEventListener("beforeunload", () => {
       if (pollTimer) clearInterval(pollTimer);
-      if (timerInterval) clearInterval(timerInterval);
+      stopTimer();
     });
   </script>
 </body>
