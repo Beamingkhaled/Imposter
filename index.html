@@ -1,17 +1,17 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ar">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Imposter Game - Arabic Version</title>
+  <title>لعبة المخبر - متعددة اللاعبين</title>
   <style>
     * { margin:0; padding:0; box-sizing:border-box; }
     body{
       font-family: Arial, sans-serif;
       background: repeating-linear-gradient(
         45deg,
-        #000000,
-        #000000 10px,
+        #22c55e,
+        #22c55e 10px,
         #ffffff 10px,
         #ffffff 20px
       );
@@ -21,34 +21,34 @@
     }
     .container{
       background:#fff;
-      border:5px solid #000000;
+      border:5px solid #22c55e;
       border-radius:15px;
       padding:25px;
-      max-width:450px;
+      max-width:500px;
       margin:0 auto;
-      box-shadow: 0 0 20px rgba(0,0,0,0.3);
+      box-shadow: 0 0 20px rgba(34, 197, 94, 0.3);
     }
-    h1{ text-align:center; color:#000000; margin-bottom:20px; }
-    h2{ color:#000000; margin:15px 0; }
+    h1{ text-align:center; color:#22c55e; margin-bottom:20px; font-size:28px; }
+    h2{ color:#22c55e; margin:15px 0; }
     input, button{ 
       width:100%; 
       padding:15px; 
       margin:10px 0; 
       font-size:18px; 
       border-radius:8px; 
-      border:3px solid #000000;
+      border:3px solid #22c55e;
       box-sizing:border-box;
       transition: all 0.3s;
     }
     button{ 
-      background:#000000; 
+      background:#22c55e; 
       color:#fff; 
       cursor:pointer; 
       font-weight:bold;
       border:none;
     }
     button:hover{ transform: scale(1.02); }
-    button:active{ background:#333333; }
+    button:active{ background:#16a34a; }
     .btn-grey{ background:#808080; }
     .btn-grey:hover { background:#666666; }
     .hide{ display:none !important; }
@@ -56,7 +56,7 @@
       font-size:70px; 
       text-align:center; 
       font-weight:900; 
-      color:#000000; 
+      color:#22c55e; 
       margin:20px 0;
       letter-spacing:8px;
       text-shadow: 2px 2px 0 #ccc;
@@ -73,45 +73,50 @@
       padding:30px;
       margin:20px 0;
       border-radius:15px;
-      border:5px solid #000000;
+      border:5px solid #22c55e;
       font-size:24px;
       font-weight:900;
       text-align:center;
-      min-height:180px;
+      min-height:200px;
       display:flex;
       align-items:center;
       justify-content:center;
       flex-direction:column;
     }
-    .normal{ background:#fff; color:#000000; }
-    .spy{ background:#000000; color:#fff; font-size:32px; }
+    .normal{ background:#fff; color:#22c55e; }
+    .spy{ background:#22c55e; color:#fff; font-size:32px; }
     .waiting{ background:#f5f5f5; color:#666; }
     .word{ 
-      font-size:48px; 
+      font-size:56px; 
       margin-top:15px; 
-      color:#000000;
+      color:#22c55e;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      direction: rtl;
+      line-height:1.2;
     }
     .players{ margin:15px 0; }
     .player{ 
       background:#f0f0f0; 
-      border:2px solid #000000; 
+      border:2px solid #22c55e; 
       padding:12px; 
       margin:8px 0; 
       border-radius:8px;
       font-weight:bold;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
     }
     .timer{ 
       font-size:50px; 
       font-weight:900; 
       text-align:center; 
-      color:#000000; 
+      color:#22c55e; 
       margin:20px 0;
     }
     .pill{
       display:inline-block;
       padding:8px 15px;
-      background:#000000;
+      background:#22c55e;
       color:#fff;
       border-radius:20px;
       font-weight:bold;
@@ -119,46 +124,68 @@
     }
     input:focus {
       outline: none;
-      box-shadow: 0 0 10px rgba(0,0,0,0.2);
+      box-shadow: 0 0 10px rgba(34, 197, 94, 0.2);
     }
     #codeInput {
       text-align: center;
       font-size: 24px;
       font-weight: bold;
       letter-spacing: 5px;
+      direction: ltr;
     }
-    .warning {
-      background: #fff3cd;
-      border: 2px solid #ffeaa7;
+    .info {
+      background: #d1ecf1;
+      border: 2px solid #bee5eb;
       border-radius: 8px;
       padding: 10px;
       margin: 10px 0;
-      color: #856404;
+      color: #0c5460;
       font-size: 14px;
       text-align: center;
     }
-    .arabic-word {
-      font-size: 56px;
-      font-weight: bold;
-      margin: 20px 0;
-      text-align: center;
-      font-family: 'Arial', sans-serif;
+    .player-status {
+      font-size: 12px;
+      padding: 3px 8px;
+      border-radius: 10px;
+      background: #22c55e;
+      color: white;
     }
+    .player-host {
+      background: #ef4444;
+    }
+    .player-you {
+      background: #3b82f6;
+    }
+    .connection-status {
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      padding: 5px 10px;
+      border-radius: 5px;
+      font-size: 12px;
+      font-weight: bold;
+    }
+    .connected { background: #22c55e; color: white; }
+    .disconnected { background: #ef4444; color: white; }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>🕵️ لعبة المخبر</h1>
-    <p style="text-align:center; font-size:11px; color:#666; margin-bottom:15px;">النسخة العربية - الأسود والأبيض</p>
+    <h1>🕵️ لعبة المخبر - متعددة اللاعبين</h1>
+    <p style="text-align:center; font-size:11px; color:#666; margin-bottom:15px;">النسخة الخضراء - يعمل على جميع الأجهزة</p>
     
+    <div class="info" id="connectionInfo">
+      جاري الاتصال بقاعدة البيانات...
+    </div>
+
     <div id="menu">
-      <button type="button" id="createBtn">إنشاء غرفة</button>
+      <button type="button" id="createBtn">إنشاء غرفة جديدة</button>
       <button type="button" id="joinBtn" class="btn-grey">انضمام إلى غرفة</button>
       <div id="menuErr" class="status"></div>
     </div>
 
     <div id="create" class="hide">
-      <h2>إنشاء غرفة</h2>
+      <h2>إنشاء غرفة جديدة</h2>
       <button type="button" id="generateBtn">توليد رمز الغرفة</button>
       <button type="button" id="backFromCreate" class="btn-grey">رجوع</button>
       <div id="createErr" class="status"></div>
@@ -173,31 +200,36 @@
     </div>
 
     <div id="lobby" class="hide">
-      <div class="pill">المضيف</div>
+      <div class="pill">👑 أنت المضيف</div>
       <h2>رمز الغرفة:</h2>
       <div class="code" id="lobbyCode">0000</div>
       <div class="players">
-        <div style="font-weight:bold; margin-bottom:10px;">اللاعبون: <span id="pCount">0</span></div>
+        <div style="font-weight:bold; margin-bottom:10px;">اللاعبون في الغرفة: <span id="pCount">0</span></div>
         <div id="pList"></div>
       </div>
-      <button type="button" id="startBtn">ابدأ اللعبة</button>
-      <button type="button" id="closeBtn" class="btn-grey">إغلاق الغرفة</button>
+      <button type="button" id="startBtn">🚀 ابدأ اللعبة الآن</button>
+      <button type="button" id="closeBtn" class="btn-grey">❌ إغلاق الغرفة</button>
       <div id="lobbyErr" class="status"></div>
     </div>
 
     <div id="waiting" class="hide">
       <div class="pill" id="waitLabel">لاعب</div>
-      <div class="roleBox waiting">بانتظار المضيف لبدء اللعبة...</div>
+      <div class="roleBox waiting">
+        <div>👥 بانتظار المضيف لبدء اللعبة...</div>
+        <div style="font-size:16px; margin-top:10px; color:#666;" id="waitingPlayers">اللاعبون: 1</div>
+      </div>
       <div id="waitErr" class="status"></div>
     </div>
 
     <div id="game" class="hide">
       <div class="pill" id="gameLabel">لاعب</div>
-      <div class="roleBox" id="role">جاري التحميل...</div>
+      <div class="roleBox" id="role">
+        جاري تحميل الدور...
+      </div>
       <div class="timer" id="timer">5:00</div>
       <div id="hostBtns" class="hide">
-        <button type="button" id="endBtn">انهي الجولة</button>
-        <button type="button" id="newBtn" class="btn-grey">جولة جديدة</button>
+        <button type="button" id="endBtn">⏹️ إنهاء الجولة</button>
+        <button type="button" id="newBtn" class="btn-grey">🔄 جولة جديدة</button>
       </div>
       <div id="gameErr" class="status"></div>
     </div>
@@ -206,23 +238,25 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
     // ========== SUPABASE CONFIGURATION ==========
-    // REPLACE THESE WITH YOUR ACTUAL SUPABASE CREDENTIALS
+    // THESE ARE YOUR CREDENTIALS FROM YOUR SUPABASE PROJECT
     const SUPABASE_URL = "https://cpegnfupiqdgmqsguyed.supabase.co";
+    // GET YOUR ANON KEY FROM: Supabase → Settings → API → anon/public key
     const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNwZWduZnVwaXFkZ21xc2d1eWVkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzI4NTA5ODMsImV4cCI6MjA0ODQyNjk4M30.zHRNKkZ5Lly4q4fRZQzT5iWTtq67j3JNkaf3-_W8BkI";
     
-    const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    // Initialize Supabase client
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
     
     // ========== GAME STATE ==========
-    let code = null;
-    let pid = null;
-    let pnum = null;
-    let host = false;
-    let poll = null;
-    let tmr = null;
+    let currentRoomCode = null;
+    let playerId = null;
+    let playerNumber = null;
+    let isHost = false;
+    let pollInterval = null;
+    let timerInterval = null;
     let currentWord = null;
     
     // ========== DOM ELEMENTS ==========
-    const sc = {
+    const screens = {
       menu: document.getElementById("menu"),
       create: document.getElementById("create"),
       join: document.getElementById("join"),
@@ -230,538 +264,610 @@
       waiting: document.getElementById("waiting"),
       game: document.getElementById("game")
     };
+    
+    const connectionInfo = document.getElementById("connectionInfo");
 
-    // ========== EVENT LISTENERS ==========
-    document.getElementById("createBtn").addEventListener("click", goCreate);
-    document.getElementById("joinBtn").addEventListener("click", goJoin);
-    document.getElementById("generateBtn").addEventListener("click", doCreate);
-    document.getElementById("joinNowBtn").addEventListener("click", doJoin);
-    document.getElementById("backFromCreate").addEventListener("click", goBack);
-    document.getElementById("backFromJoin").addEventListener("click", goBack);
-    document.getElementById("startBtn").addEventListener("click", doStart);
-    document.getElementById("closeBtn").addEventListener("click", doClose);
-    document.getElementById("endBtn").addEventListener("click", doEnd);
-    document.getElementById("newBtn").addEventListener("click", doNew);
-
-    // Code input formatting
-    document.getElementById("codeInput").addEventListener("input", function(e) {
-      this.value = this.value.replace(/\D/g, '').slice(0, 4);
+    // ========== INITIALIZATION ==========
+    document.addEventListener('DOMContentLoaded', async () => {
+      try {
+        // Test connection to Supabase
+        const { data, error } = await supabase.from('words').select('text').limit(1);
+        
+        if (error) {
+          console.error("Supabase connection error:", error);
+          connectionInfo.innerHTML = "❌ مشكلة في الاتصال بقاعدة البيانات. تحقق من المفتاح API.";
+          connectionInfo.style.background = "#f8d7da";
+          connectionInfo.style.borderColor = "#f5c6cb";
+          connectionInfo.style.color = "#721c24";
+          
+          // Try to create tables if they don't exist
+          await createTables();
+        } else {
+          console.log("✅ Connected to Supabase! Words found:", data.length);
+          connectionInfo.innerHTML = `✅ متصل بقاعدة البيانات - ${data.length} كلمة جاهزة`;
+          connectionInfo.style.background = "#d4edda";
+          connectionInfo.style.borderColor = "#c3e6cb";
+          connectionInfo.style.color = "#155724";
+        }
+      } catch (error) {
+        console.error("Initialization error:", error);
+        connectionInfo.innerHTML = "⚠️ تحقق من اتصال الإنترنت والمفتاح API";
+      }
+      
+      setupEventListeners();
+      restoreSession();
     });
 
-    // ========== FUNCTIONS ==========
-    function hideAll() {
-      Object.values(sc).forEach(s => s.classList.add("hide"));
+    // ========== EVENT LISTENERS ==========
+    function setupEventListeners() {
+      document.getElementById("createBtn").addEventListener("click", showCreateScreen);
+      document.getElementById("joinBtn").addEventListener("click", showJoinScreen);
+      document.getElementById("generateBtn").addEventListener("click", createRoom);
+      document.getElementById("joinNowBtn").addEventListener("click", joinRoom);
+      document.getElementById("backFromCreate").addEventListener("click", goBackToMenu);
+      document.getElementById("backFromJoin").addEventListener("click", goBackToMenu);
+      document.getElementById("startBtn").addEventListener("click", startGame);
+      document.getElementById("closeBtn").addEventListener("click", closeRoom);
+      document.getElementById("endBtn").addEventListener("click", endRound);
+      document.getElementById("newBtn").addEventListener("click", newRound);
+      
+      document.getElementById("codeInput").addEventListener("input", function(e) {
+        this.value = this.value.replace(/\D/g, '').slice(0, 4);
+      });
     }
 
-    function goCreate() {
-      hideAll();
-      sc.create.classList.remove("hide");
+    // ========== SCREEN MANAGEMENT ==========
+    function hideAllScreens() {
+      Object.values(screens).forEach(screen => screen.classList.add("hide"));
+    }
+
+    function showCreateScreen() {
+      hideAllScreens();
+      screens.create.classList.remove("hide");
       document.getElementById("createErr").textContent = "";
     }
 
-    function goJoin() {
-      hideAll();
-      sc.join.classList.remove("hide");
+    function showJoinScreen() {
+      hideAllScreens();
+      screens.join.classList.remove("hide");
       document.getElementById("codeInput").focus();
       document.getElementById("joinErr").textContent = "";
     }
 
-    function goBack() {
-      if(poll) clearInterval(poll);
-      hideAll();
-      sc.menu.classList.remove("hide");
+    function goBackToMenu() {
+      if (pollInterval) clearInterval(pollInterval);
+      if (timerInterval) clearInterval(timerInterval);
+      hideAllScreens();
+      screens.menu.classList.remove("hide");
     }
 
-    async function doCreate() {
-      document.getElementById("createErr").textContent = "";
-      
+    // ========== DATABASE FUNCTIONS ==========
+    async function createTables() {
       try {
-        // Generate player ID if not exists
-        pid = sessionStorage.getItem("pid") || ("p_" + Date.now() + Math.random().toString(36).substr(2, 9));
-        sessionStorage.setItem("pid", pid);
-
-        // Generate 4-digit code
-        code = String(Math.floor(1000 + Math.random() * 9000));
-        
-        console.log("Creating room with code:", code);
-
-        // First, create the necessary tables if they don't exist
-        await createTablesIfNeeded();
-
-        // Create room in Supabase
-        const {error: re} = await sb.from("rooms").insert([{
-          code: code,
-          status: "open",
-          state: "waiting",
-          host_player_id: pid,
-          created_at: new Date().toISOString()
-        }]);
-        
-        if(re) {
-          console.error("Room creation error:", re);
-          // If error is about table not existing, create it
-          if (re.message.includes("relation") && re.message.includes("does not exist")) {
-            await createTablesIfNeeded();
-            // Try again
-            const {error: re2} = await sb.from("rooms").insert([{
-              code: code,
-              status: "open",
-              state: "waiting",
-              host_player_id: pid,
-              created_at: new Date().toISOString()
-            }]);
-            if (re2) throw re2;
-          } else {
-            throw re;
-          }
-        }
-
-        // Add host as player 1
-        const {error: pe} = await sb.from("players").insert([{
-          room_code: code,
-          player_id: pid,
-          player_num: 1,
-          joined_at: new Date().toISOString()
-        }]);
-        
-        if(pe) throw pe;
-
-        pnum = 1;
-        host = true;
-        sessionStorage.setItem("code", code);
-        sessionStorage.setItem("pnum", "1");
-        sessionStorage.setItem("host", "1");
-
-        document.getElementById("lobbyCode").textContent = code;
-        hideAll();
-        sc.lobby.classList.remove("hide");
-        doPoll();
-
-      } catch(e) {
-        console.error("Create error:", e);
-        document.getElementById("createErr").textContent = e.message || "فشل في إنشاء الغرفة";
-      }
-    }
-
-    async function doJoin() {
-      document.getElementById("joinErr").textContent = "";
-      
-      try {
-        code = document.getElementById("codeInput").value.trim();
-        
-        if(!/^\d{4}$/.test(code)) {
-          document.getElementById("joinErr").textContent = "أدخل 4 أرقام";
-          return;
-        }
-
-        console.log("Joining room:", code);
-
-        // Generate player ID if not exists
-        pid = sessionStorage.getItem("pid") || ("p_" + Date.now() + Math.random().toString(36).substr(2, 9));
-        sessionStorage.setItem("pid", pid);
-
-        // Check if room exists and is open
-        const {data: rm, error: re} = await sb.from("rooms")
-          .select("*")
-          .eq("code", code)
-          .maybeSingle();
-          
-        if(re) throw re;
-        
-        if(!rm) {
-          document.getElementById("joinErr").textContent = "الغرفة غير موجودة";
-          return;
-        }
-        
-        if(rm.status !== "open") {
-          document.getElementById("joinErr").textContent = "الغرفة مغلقة";
-          return;
-        }
-
-        // Check if player already exists in this room
-        const {data: ex} = await sb.from("players")
-          .select("player_num")
-          .eq("room_code", code)
-          .eq("player_id", pid)
-          .maybeSingle();
-
-        if(ex) {
-          pnum = ex.player_num;
-          console.log("Existing player, number:", pnum);
-        } else {
-          // Get all players to determine next number
-          const {data: pls} = await sb.from("players")
-            .select("player_num")
-            .eq("room_code", code);
-            
-          const used = new Set((pls || []).map(p => p.player_num));
-          let n = 1;
-          while(used.has(n)) n++;
-
-          // Add new player
-          const {error: ae} = await sb.from("players").insert([{
-            room_code: code,
-            player_id: pid,
-            player_num: n,
-            joined_at: new Date().toISOString()
-          }]);
-          
-          if(ae) throw ae;
-          pnum = n;
-          console.log("New player, number:", pnum);
-        }
-
-        host = false;
-        sessionStorage.setItem("code", code);
-        sessionStorage.setItem("pnum", String(pnum));
-        sessionStorage.setItem("host", "0");
-
-        document.getElementById("waitLabel").textContent = "لاعب " + pnum;
-        hideAll();
-        sc.waiting.classList.remove("hide");
-        doPoll();
-
-      } catch(e) {
-        console.error("Join error:", e);
-        document.getElementById("joinErr").textContent = e.message || "فشل في الانضمام للغرفة";
-      }
-    }
-
-    async function doStart() {
-      document.getElementById("lobbyErr").textContent = "";
-      
-      try {
-        // Get all players
-        const {data: pls} = await sb.from("players")
-          .select("player_id")
-          .eq("room_code", code);
-          
-        if(!pls || pls.length < 2) {
-          document.getElementById("lobbyErr").textContent = "يحتاج لاعبين على الأقل 2";
-          return;
-        }
-
-        console.log("Starting game with players:", pls.length);
-
-        // Get random Arabic word from your Supabase table
-        const {data: wds, error: wdErr} = await sb.from("words").select("text");
-        
-        if(wdErr) throw wdErr;
-        if(!wds || wds.length === 0) {
-          document.getElementById("lobbyErr").textContent = "لا توجد كلمات متاحة";
-          return;
-        }
-        
-        const wordData = wds[Math.floor(Math.random() * wds.length)];
-        currentWord = wordData.text;
-        console.log("Selected Arabic word:", currentWord);
-
-        // Determine number of imposters based on player count
-        const playerCount = pls.length;
-        const imposterCount = playerCount >= 5 ? 2 : 1;
-        console.log(`Players: ${playerCount}, Imposters: ${imposterCount}`);
-
-        // Shuffle players and select imposters
-        const shuffledPlayers = [...pls].sort(() => Math.random() - 0.5);
-        const imposters = shuffledPlayers.slice(0, imposterCount).map(p => p.player_id);
-        
-        console.log("Imposters selected:", imposters);
-
-        // Update room state
-        const {error: ue} = await sb.from("rooms").update({
-          state: "playing",
-          word: currentWord,
-          spy_player_id: imposters[0],
-          imposters: imposters,
-          started_at: new Date().toISOString()
-        }).eq("code", code);
-        
-        if(ue) throw ue;
-
-        console.log("Game started successfully");
-
-      } catch(e) {
-        console.error("Start error:", e);
-        document.getElementById("lobbyErr").textContent = e.message || "فشل في بدء اللعبة";
-      }
-    }
-
-    async function doEnd() {
-      if(!confirm("هل تريد إنهاء الجولة؟")) return;
-      
-      try {
-        await sb.from("rooms").update({state: "ended"}).eq("code", code);
-        console.log("Round ended");
-      } catch(e) {
-        console.error("End round error:", e);
-      }
-    }
-
-    async function doNew() {
-      if(!confirm("هل تريد بدء جولة جديدة؟")) return;
-      
-      try {
-        await sb.from("rooms").update({
-          state: "waiting",
-          word: null,
-          spy_player_id: null,
-          imposters: null,
-          started_at: null
-        }).eq("code", code);
-        
-        console.log("New round started");
-        
-        // Update local display
-        hideAll();
-        sc.lobby.classList.remove("hide");
-        document.getElementById("lobbyErr").textContent = "جاري بدء جولة جديدة...";
-        document.getElementById("lobbyErr").className = "status success";
-        
-      } catch(e) {
-        console.error("New round error:", e);
-      }
-    }
-
-    async function doClose() {
-      if(!confirm("هل تريد إغلاق الغرفة؟ سيتم فصل جميع اللاعبين.")) return;
-      
-      try {
-        await sb.from("rooms").update({status: "closed"}).eq("code", code);
-        await sb.from("players").delete().eq("room_code", code);
-        
-        if(poll) clearInterval(poll);
-        goBack();
-      } catch(e) {
-        console.error("Close room error:", e);
-      }
-    }
-
-    async function createTablesIfNeeded() {
-      try {
-        // Check if rooms table exists
-        const { error: roomsError } = await sb.from('rooms').select('*').limit(1);
+        // Create rooms table if it doesn't exist
+        const { error: roomsError } = await supabase.from('rooms').select('*').limit(1);
         
         if (roomsError && roomsError.message.includes("does not exist")) {
           console.log("Creating tables...");
           
-          // Run SQL to create tables (you need to run this in Supabase SQL Editor)
-          // Since we can't run DDL from client, we'll show instructions
-          const needsSetup = !sessionStorage.getItem('tables_created_notice');
+          // You need to run this SQL in your Supabase SQL Editor:
+          const setupSQL = `
+            -- Create rooms table
+            CREATE TABLE IF NOT EXISTS rooms (
+              code TEXT PRIMARY KEY,
+              status TEXT DEFAULT 'open',
+              state TEXT DEFAULT 'waiting',
+              word TEXT,
+              spy_player_id TEXT,
+              imposters TEXT[],
+              host_player_id TEXT,
+              started_at TIMESTAMPTZ,
+              created_at TIMESTAMPTZ DEFAULT NOW()
+            );
+
+            -- Create players table
+            CREATE TABLE IF NOT EXISTS players (
+              id BIGSERIAL PRIMARY KEY,
+              room_code TEXT REFERENCES rooms(code) ON DELETE CASCADE,
+              player_id TEXT NOT NULL,
+              player_num INTEGER NOT NULL,
+              joined_at TIMESTAMPTZ DEFAULT NOW(),
+              UNIQUE(room_code, player_id),
+              UNIQUE(room_code, player_num)
+            );
+
+            -- Enable RLS
+            ALTER TABLE rooms ENABLE ROW LEVEL SECURITY;
+            ALTER TABLE players ENABLE ROW LEVEL SECURITY;
+
+            -- Create policies
+            CREATE POLICY "Anyone can view rooms" ON rooms FOR SELECT USING (true);
+            CREATE POLICY "Anyone can insert rooms" ON rooms FOR INSERT WITH CHECK (true);
+            CREATE POLICY "Anyone can update rooms" ON rooms FOR UPDATE USING (true);
+            
+            CREATE POLICY "Anyone can view players" ON players FOR SELECT USING (true);
+            CREATE POLICY "Anyone can insert players" ON players FOR INSERT WITH CHECK (true);
+            CREATE POLICY "Anyone can delete players" ON players FOR DELETE USING (true);
+          `;
           
-          if (needsSetup) {
-            alert("⚠️ تحتاج إلى إنشاء الجداول في Supabase أولاً.\n\nاذهب إلى SQL Editor في Supabase وأشغل هذا الكود:\n\n" + getSetupSQL());
-            sessionStorage.setItem('tables_created_notice', 'true');
-          }
+          alert("⚠️ تحتاج إلى إنشاء الجداول أولاً.\n\nاذهب إلى Supabase → SQL Editor وأشغل هذا الكود:\n\n" + setupSQL);
+          return false;
         }
-      } catch (e) {
-        console.error("Table check error:", e);
+        return true;
+      } catch (error) {
+        console.error("Table creation error:", error);
+        return false;
       }
     }
 
-    function getSetupSQL() {
-      return `-- إنشاء جدول الغرف
-CREATE TABLE IF NOT EXISTS rooms (
-  code TEXT PRIMARY KEY,
-  status TEXT DEFAULT 'open',
-  state TEXT DEFAULT 'waiting',
-  word TEXT,
-  spy_player_id TEXT,
-  imposters TEXT[],
-  host_player_id TEXT,
-  started_at TIMESTAMPTZ,
-  created_at TIMESTAMPTZ DEFAULT NOW()
-);
+    async function createRoom() {
+      const errorElement = document.getElementById("createErr");
+      errorElement.textContent = "";
+      
+      try {
+        // Generate unique player ID
+        playerId = 'player_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+        
+        // Generate unique 4-digit room code
+        let roomCode;
+        let isUnique = false;
+        
+        while (!isUnique) {
+          roomCode = String(Math.floor(1000 + Math.random() * 9000));
+          
+          // Check if room code already exists
+          const { data: existingRoom } = await supabase
+            .from('rooms')
+            .select('code')
+            .eq('code', roomCode)
+            .maybeSingle();
+          
+          if (!existingRoom) {
+            isUnique = true;
+          }
+        }
+        
+        currentRoomCode = roomCode;
+        
+        console.log("Creating room:", currentRoomCode);
 
--- إنشاء جدول اللاعبين
-CREATE TABLE IF NOT EXISTS players (
-  id BIGSERIAL PRIMARY KEY,
-  room_code TEXT REFERENCES rooms(code) ON DELETE CASCADE,
-  player_id TEXT NOT NULL,
-  player_num INTEGER NOT NULL,
-  joined_at TIMESTAMPTZ DEFAULT NOW(),
-  UNIQUE(room_code, player_id),
-  UNIQUE(room_code, player_num)
-);
+        // Create room in database
+        const { error: roomError } = await supabase.from('rooms').insert([{
+          code: currentRoomCode,
+          status: 'open',
+          state: 'waiting',
+          host_player_id: playerId,
+          created_at: new Date().toISOString()
+        }]);
 
--- تمكين أمان مستوى الصفوف
-ALTER TABLE rooms ENABLE ROW LEVEL SECURITY;
-ALTER TABLE players ENABLE ROW LEVEL SECURITY;
+        if (roomError) throw roomError;
 
--- سياسات الوصول للغرف
-CREATE POLICY "الجميع يمكنهم رؤية الغرف" ON rooms
-  FOR SELECT USING (true);
+        // Add host as first player
+        const { error: playerError } = await supabase.from('players').insert([{
+          room_code: currentRoomCode,
+          player_id: playerId,
+          player_num: 1,
+          joined_at: new Date().toISOString()
+        }]);
 
-CREATE POLICY "الجميع يمكنهم إضافة غرف" ON rooms
-  FOR INSERT WITH CHECK (true);
+        if (playerError) throw playerError;
 
-CREATE POLICY "الجميع يمكنهم تحديث الغرف" ON rooms
-  FOR UPDATE USING (true);
+        playerNumber = 1;
+        isHost = true;
+        
+        // Save to session storage
+        sessionStorage.setItem('imposter_room_code', currentRoomCode);
+        sessionStorage.setItem('imposter_player_id', playerId);
+        sessionStorage.setItem('imposter_player_num', '1');
+        sessionStorage.setItem('imposter_is_host', 'true');
 
--- سياسات الوصول للاعبين
-CREATE POLICY "الجميع يمكنهم رؤية اللاعبين" ON players
-  FOR SELECT USING (true);
+        // Show lobby
+        document.getElementById("lobbyCode").textContent = currentRoomCode;
+        hideAllScreens();
+        screens.lobby.classList.remove("hide");
+        
+        // Start polling for updates
+        startPolling();
 
-CREATE POLICY "الجميع يمكنهم إضافة لاعبين" ON players
-  FOR INSERT WITH CHECK (true);
-
-CREATE POLICY "الجميع يمكنهم حذف اللاعبين" ON players
-  FOR DELETE USING (true);
-
--- إنشاء فهارس للأداء
-CREATE INDEX IF NOT EXISTS idx_rooms_code ON rooms(code);
-CREATE INDEX IF NOT EXISTS idx_players_room_code ON players(room_code);`;
+      } catch (error) {
+        console.error("Create room error:", error);
+        errorElement.textContent = "❌ فشل في إنشاء الغرفة: " + error.message;
+      }
     }
 
-    function doPoll() {
-      if(poll) clearInterval(poll);
+    async function joinRoom() {
+      const errorElement = document.getElementById("joinErr");
+      errorElement.textContent = "";
       
-      poll = setInterval(async () => {
+      try {
+        const inputCode = document.getElementById("codeInput").value.trim();
+        
+        if (!/^\d{4}$/.test(inputCode)) {
+          errorElement.textContent = "⚠️ أدخل 4 أرقام صحيحة";
+          return;
+        }
+        
+        currentRoomCode = inputCode;
+        
+        console.log("Joining room:", currentRoomCode);
+
+        // Check if room exists and is open
+        const { data: room, error: roomError } = await supabase
+          .from('rooms')
+          .select('*')
+          .eq('code', currentRoomCode)
+          .maybeSingle();
+
+        if (roomError) throw roomError;
+        if (!room) {
+          errorElement.textContent = "❌ الغرفة غير موجودة";
+          return;
+        }
+        if (room.status !== 'open') {
+          errorElement.textContent = "❌ الغرفة مغلقة";
+          return;
+        }
+
+        // Generate player ID
+        playerId = 'player_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+        
+        // Check if already in room
+        const { data: existingPlayer } = await supabase
+          .from('players')
+          .select('player_num')
+          .eq('room_code', currentRoomCode)
+          .eq('player_id', playerId)
+          .maybeSingle();
+
+        if (existingPlayer) {
+          playerNumber = existingPlayer.player_num;
+        } else {
+          // Get all players to find next available number
+          const { data: allPlayers } = await supabase
+            .from('players')
+            .select('player_num')
+            .eq('room_code', currentRoomCode);
+
+          const usedNumbers = new Set(allPlayers.map(p => p.player_num));
+          let nextNumber = 1;
+          while (usedNumbers.has(nextNumber)) nextNumber++;
+
+          // Add player to database
+          const { error: addError } = await supabase.from('players').insert([{
+            room_code: currentRoomCode,
+            player_id: playerId,
+            player_num: nextNumber,
+            joined_at: new Date().toISOString()
+          }]);
+
+          if (addError) throw addError;
+          playerNumber = nextNumber;
+        }
+
+        isHost = false;
+        
+        // Save to session storage
+        sessionStorage.setItem('imposter_room_code', currentRoomCode);
+        sessionStorage.setItem('imposter_player_id', playerId);
+        sessionStorage.setItem('imposter_player_num', playerNumber.toString());
+        sessionStorage.setItem('imposter_is_host', 'false');
+
+        // Show waiting screen
+        document.getElementById("waitLabel").textContent = `لاعب ${playerNumber}`;
+        hideAllScreens();
+        screens.waiting.classList.remove("hide");
+        
+        // Start polling
+        startPolling();
+
+      } catch (error) {
+        console.error("Join room error:", error);
+        errorElement.textContent = "❌ فشل في الانضمام: " + error.message;
+      }
+    }
+
+    async function startGame() {
+      const errorElement = document.getElementById("lobbyErr");
+      errorElement.textContent = "";
+      
+      try {
+        // Get all players in room
+        const { data: players, error: playersError } = await supabase
+          .from('players')
+          .select('player_id')
+          .eq('room_code', currentRoomCode);
+
+        if (playersError) throw playersError;
+        if (!players || players.length < 2) {
+          errorElement.textContent = "⚠️ يحتاج لاعبين على الأقل 2";
+          return;
+        }
+
+        console.log("Starting game with", players.length, "players");
+
+        // Get random word from YOUR Arabic words table
+        const { data: words, error: wordsError } = await supabase
+          .from('words')
+          .select('text');
+
+        if (wordsError) throw wordsError;
+        if (!words || words.length === 0) {
+          errorElement.textContent = "❌ لا توجد كلمات في قاعدة البيانات";
+          return;
+        }
+
+        const randomWord = words[Math.floor(Math.random() * words.length)].text;
+        currentWord = randomWord;
+        
+        console.log("Selected word:", currentWord);
+
+        // Determine number of imposters
+        const playerCount = players.length;
+        const imposterCount = playerCount >= 5 ? 2 : 1;
+        
+        // Select imposters randomly
+        const shuffledPlayers = [...players].sort(() => Math.random() - 0.5);
+        const imposters = shuffledPlayers.slice(0, imposterCount).map(p => p.player_id);
+
+        // Update room to playing state
+        const { error: updateError } = await supabase
+          .from('rooms')
+          .update({
+            state: 'playing',
+            word: currentWord,
+            spy_player_id: imposters[0],
+            imposters: imposters,
+            started_at: new Date().toISOString()
+          })
+          .eq('code', currentRoomCode);
+
+        if (updateError) throw updateError;
+
+        console.log("Game started successfully!");
+
+      } catch (error) {
+        console.error("Start game error:", error);
+        errorElement.textContent = "❌ فشل في بدء اللعبة: " + error.message;
+      }
+    }
+
+    // ========== POLLING FOR UPDATES ==========
+    function startPolling() {
+      if (pollInterval) clearInterval(pollInterval);
+      
+      pollInterval = setInterval(async () => {
         try {
-          if(!code) return;
-          
-          const {data: rm, error: re} = await sb.from("rooms")
-            .select("*")
-            .eq("code", code)
+          if (!currentRoomCode) return;
+
+          // Get room status
+          const { data: room, error: roomError } = await supabase
+            .from('rooms')
+            .select('*')
+            .eq('code', currentRoomCode)
             .maybeSingle();
-            
-          if(re) throw re;
+
+          if (roomError) throw roomError;
           
-          if(!rm || rm.status !== "open") {
-            if(poll) clearInterval(poll);
+          if (!room || room.status !== 'open') {
+            clearInterval(pollInterval);
             alert("تم إغلاق الغرفة");
-            goBack();
+            goBackToMenu();
             return;
           }
 
-          // Update lobby if host
-          if(host && rm.state === "waiting") {
-            const {data: pls} = await sb.from("players")
-              .select("player_num, player_id")
-              .eq("room_code", code)
-              .order("player_num");
-              
-            if(pls) {
-              document.getElementById("pCount").textContent = pls.length;
-              document.getElementById("pList").innerHTML = pls
-                .map(p => `<div class="player">لاعب ${p.player_num}${p.player_id === pid ? ' (أنت - المضيف)' : ''}</div>`)
-                .join("");
-            }
+          // Get players in room
+          const { data: players } = await supabase
+            .from('players')
+            .select('player_id, player_num')
+            .eq('room_code', currentRoomCode)
+            .order('player_num');
+
+          // Update lobby or waiting screen
+          if (isHost && room.state === 'waiting') {
+            updateLobbyDisplay(players);
+          } else if (!isHost && room.state === 'waiting') {
+            updateWaitingDisplay(players);
           }
 
-          // Handle game state changes
-          if(rm.state === "playing" && rm.started_at) {
-            showGame(rm);
-          } else if(rm.state === "ended") {
-            if(host) {
-              hideAll();
-              sc.lobby.classList.remove("hide");
-              document.getElementById("lobbyErr").textContent = "انتهت الجولة. انقر على 'جولة جديدة' للبدء مرة أخرى.";
-              document.getElementById("lobbyErr").className = "status";
+          // Handle game state
+          if (room.state === 'playing' && room.started_at) {
+            showGameScreen(room);
+          } else if (room.state === 'ended') {
+            if (isHost) {
+              hideAllScreens();
+              screens.lobby.classList.remove("hide");
+              document.getElementById("lobbyErr").textContent = "🏁 انتهت الجولة";
+              updateLobbyDisplay(players);
             } else {
-              hideAll();
-              sc.waiting.classList.remove("hide");
-              document.getElementById("waitErr").textContent = "انتهت الجولة. بانتظار المضيف...";
+              hideAllScreens();
+              screens.waiting.classList.remove("hide");
+              document.getElementById("waitErr").textContent = "🏁 انتهت الجولة - بانتظار المضيف";
             }
           }
 
-        } catch(e) {
-          console.error("Poll error:", e);
+        } catch (error) {
+          console.error("Polling error:", error);
         }
-      }, 2000);
+      }, 2000); // Poll every 2 seconds
     }
 
-    function showGame(rm) {
-      hideAll();
-      sc.game.classList.remove("hide");
+    function updateLobbyDisplay(players) {
+      if (!players) return;
+      
+      document.getElementById("pCount").textContent = players.length;
+      
+      const playersList = document.getElementById("pList");
+      playersList.innerHTML = players.map(player => `
+        <div class="player">
+          <span>لاعب ${player.player_num}</span>
+          <div>
+            ${player.player_id === playerId ? '<span class="player-status player-you">أنت</span>' : ''}
+            ${player.player_id === playerId ? '<span class="player-status player-host">المضيف</span>' : ''}
+          </div>
+        </div>
+      `).join('');
+    }
 
-      const imps = rm.imposters || (rm.spy_player_id ? [rm.spy_player_id] : []);
-      const isImp = imps.includes(pid);
+    function updateWaitingDisplay(players) {
+      if (!players) return;
+      document.getElementById("waitingPlayers").textContent = `اللاعبون: ${players.length}`;
+    }
 
-      document.getElementById("gameLabel").textContent = "لاعب " + pnum;
-      const rb = document.getElementById("role");
+    function showGameScreen(room) {
+      hideAllScreens();
+      screens.game.classList.remove("hide");
 
-      if(isImp) {
-        rb.className = "roleBox spy";
-        rb.innerHTML = "🕵️<br><br>أنت المخبر<br><br>🎭";
+      const isImposter = room.imposters && room.imposters.includes(playerId);
+      
+      document.getElementById("gameLabel").textContent = `لاعب ${playerNumber}`;
+      
+      const roleBox = document.getElementById("role");
+      
+      if (isImposter) {
+        roleBox.className = "roleBox spy";
+        roleBox.innerHTML = `
+          🕵️<br><br>
+          <strong>أنت المخبر!</strong><br><br>
+          حاول اكتشاف الكلمة<br>
+          دون أن يعرف الآخرون<br><br>
+          🎭
+        `;
       } else {
-        rb.className = "roleBox normal";
-        rb.innerHTML = `الكلمة السرية هي:<div class="word arabic-word">${escapeHtml(rm.word || "غير معروف")}</div>`;
+        roleBox.className = "roleBox normal";
+        roleBox.innerHTML = `
+          الكلمة السرية هي:<br><br>
+          <div class="word">${escapeHtml(room.word || "جار التحميل...")}</div><br>
+          حاول وصفها دون ذكر اسمها!
+        `;
       }
 
-      // Show host buttons if host
-      if(host) {
+      // Show host controls if host
+      if (isHost) {
         document.getElementById("hostBtns").classList.remove("hide");
       }
 
       // Start timer
-      const start = new Date(rm.started_at).getTime();
-      if(tmr) clearInterval(tmr);
+      startTimer(room.started_at);
+    }
+
+    function startTimer(startTime) {
+      if (timerInterval) clearInterval(timerInterval);
       
-      tmr = setInterval(() => {
+      const start = new Date(startTime).getTime();
+      
+      timerInterval = setInterval(() => {
         const elapsed = Math.floor((Date.now() - start) / 1000);
         const remaining = Math.max(0, 300 - elapsed); // 5 minutes
+        
         const minutes = Math.floor(remaining / 60);
         const seconds = remaining % 60;
         
-        document.getElementById("timer").textContent = remaining > 0
-          ? `${minutes}:${String(seconds).padStart(2, "0")}`
-          : "انتهى الوقت ⏰";
+        document.getElementById("timer").textContent = 
+          `${minutes}:${seconds.toString().padStart(2, '0')}`;
+        
+        if (remaining <= 0) {
+          clearInterval(timerInterval);
+          document.getElementById("timer").textContent = "⏰ انتهى الوقت!";
+        }
       }, 1000);
     }
 
+    // ========== GAME CONTROL FUNCTIONS ==========
+    async function endRound() {
+      if (!confirm("هل تريد إنهاء الجولة الحالية؟")) return;
+      
+      try {
+        await supabase
+          .from('rooms')
+          .update({ state: 'ended' })
+          .eq('code', currentRoomCode);
+      } catch (error) {
+        console.error("End round error:", error);
+      }
+    }
+
+    async function newRound() {
+      if (!confirm("هل تريد بدء جولة جديدة؟")) return;
+      
+      try {
+        await supabase
+          .from('rooms')
+          .update({
+            state: 'waiting',
+            word: null,
+            spy_player_id: null,
+            imposters: null,
+            started_at: null
+          })
+          .eq('code', currentRoomCode);
+      } catch (error) {
+        console.error("New round error:", error);
+      }
+    }
+
+    async function closeRoom() {
+      if (!confirm("هل تريد إغلاق الغرفة؟ سيتم فصل جميع اللاعبين.")) return;
+      
+      try {
+        await supabase
+          .from('rooms')
+          .update({ status: 'closed' })
+          .eq('code', currentRoomCode);
+        
+        await supabase
+          .from('players')
+          .delete()
+          .eq('room_code', currentRoomCode);
+        
+        // Clear session
+        sessionStorage.clear();
+        
+        goBackToMenu();
+      } catch (error) {
+        console.error("Close room error:", error);
+      }
+    }
+
+    // ========== UTILITY FUNCTIONS ==========
+    function restoreSession() {
+      const savedCode = sessionStorage.getItem('imposter_room_code');
+      const savedPlayerId = sessionStorage.getItem('imposter_player_id');
+      const savedPlayerNum = sessionStorage.getItem('imposter_player_num');
+      const savedIsHost = sessionStorage.getItem('imposter_is_host');
+      
+      if (savedCode && savedPlayerId && savedPlayerNum) {
+        currentRoomCode = savedCode;
+        playerId = savedPlayerId;
+        playerNumber = parseInt(savedPlayerNum);
+        isHost = savedIsHost === 'true';
+        
+        console.log("Restored session for player", playerNumber, "in room", currentRoomCode);
+        
+        if (isHost) {
+          document.getElementById("lobbyCode").textContent = currentRoomCode;
+          hideAllScreens();
+          screens.lobby.classList.remove("hide");
+        } else {
+          document.getElementById("waitLabel").textContent = `لاعب ${playerNumber}`;
+          hideAllScreens();
+          screens.waiting.classList.remove("hide");
+        }
+        
+        startPolling();
+      }
+    }
+
     function escapeHtml(text) {
+      if (!text) return "";
       const div = document.createElement('div');
       div.textContent = text;
       return div.innerHTML;
     }
 
-    // ========== INITIALIZE ==========
-    window.addEventListener("load", async () => {
-      // Test Supabase connection
-      try {
-        const { data, error } = await sb.from('words').select('text').limit(1);
-        
-        if (error) {
-          console.error("Supabase connection error:", error);
-          document.getElementById("menu").insertAdjacentHTML('afterbegin', 
-            '<div class="warning">⚠️ مشكلة في الاتصال بـ Supabase. تأكد من صحة المفتاح API.</div>'
-          );
-        } else {
-          console.log("Connected to Supabase successfully. Words available:", data ? data.length : 0);
-        }
-      } catch (e) {
-        console.error("Initial connection test failed:", e);
-      }
-      
-      const c = sessionStorage.getItem("code");
-      const n = sessionStorage.getItem("pnum");
-      const p = sessionStorage.getItem("pid");
-      const h = sessionStorage.getItem("host") === "1";
-
-      if(c && n && p) {
-        code = c;
-        pnum = parseInt(n);
-        pid = p;
-        host = h;
-
-        console.log("Restored session:", { code, pnum, pid, host });
-
-        if(host) {
-          document.getElementById("lobbyCode").textContent = code;
-          hideAll();
-          sc.lobby.classList.remove("hide");
-        } else {
-          document.getElementById("waitLabel").textContent = "لاعب " + pnum;
-          hideAll();
-          sc.waiting.classList.remove("hide");
-        }
-        doPoll();
-      }
-    });
-
-    window.addEventListener("beforeunload", () => {
-      if(poll) clearInterval(poll);
-      if(tmr) clearInterval(tmr);
+    // Cleanup on page unload
+    window.addEventListener('beforeunload', () => {
+      if (pollInterval) clearInterval(pollInterval);
+      if (timerInterval) clearInterval(timerInterval);
     });
   </script>
 </body>
