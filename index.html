@@ -10,58 +10,69 @@
       font-family: Arial, sans-serif;
       background: repeating-linear-gradient(
         45deg,
-        #6B46C1,
-        #6B46C1 10px,
-        #808080 10px,
-        #808080 20px
+        #000000,
+        #000000 10px,
+        #ffffff 10px,
+        #ffffff 20px
       );
       min-height:100vh;
       padding:20px;
     }
     .container{
       background:#fff;
-      border:5px solid #6B46C1;
+      border:5px solid #000000;
       border-radius:15px;
       padding:25px;
       max-width:450px;
       margin:0 auto;
+      box-shadow: 0 0 20px rgba(0,0,0,0.3);
     }
-    h1{ text-align:center; color:#6B46C1; margin-bottom:20px; }
-    h2{ color:#6B46C1; margin:15px 0; }
+    h1{ text-align:center; color:#000000; margin-bottom:20px; }
+    h2{ color:#000000; margin:15px 0; }
     input, button{ 
       width:100%; 
       padding:15px; 
       margin:10px 0; 
       font-size:18px; 
       border-radius:8px; 
-      border:3px solid #6B46C1;
+      border:3px solid #000000;
       box-sizing:border-box;
+      transition: all 0.3s;
     }
     button{ 
-      background:#6B46C1; 
+      background:#000000; 
       color:#fff; 
       cursor:pointer; 
       font-weight:bold;
       border:none;
     }
-    button:active{ background:#553399; }
+    button:hover{ transform: scale(1.02); }
+    button:active{ background:#333333; }
     .btn-grey{ background:#808080; }
-    .btn-grey:active{ background:#666; }
-    .hide{ display:none; }
+    .btn-grey:hover { background:#666666; }
+    .hide{ display:none !important; }
     .code{ 
       font-size:70px; 
       text-align:center; 
       font-weight:900; 
-      color:#6B46C1; 
+      color:#000000; 
       margin:20px 0;
       letter-spacing:8px;
+      text-shadow: 2px 2px 0 #ccc;
     }
-    .status{ color:#d00; font-weight:bold; margin:10px 0; text-align:center; }
+    .status{ 
+      color:#d00; 
+      font-weight:bold; 
+      margin:10px 0; 
+      text-align:center;
+      min-height:24px;
+    }
+    .success { color: #008000; }
     .roleBox{
       padding:30px;
       margin:20px 0;
       border-radius:15px;
-      border:5px solid #6B46C1;
+      border:5px solid #000000;
       font-size:24px;
       font-weight:900;
       text-align:center;
@@ -71,14 +82,14 @@
       justify-content:center;
       flex-direction:column;
     }
-    .normal{ background:#fff; color:#6B46C1; }
-    .spy{ background:#6B46C1; color:#fff; font-size:32px; }
+    .normal{ background:#fff; color:#000000; }
+    .spy{ background:#000000; color:#fff; font-size:32px; }
     .waiting{ background:#f5f5f5; color:#666; }
-    .word{ font-size:48px; margin-top:15px; color:#6B46C1; }
+    .word{ font-size:48px; margin-top:15px; color:#000000; }
     .players{ margin:15px 0; }
     .player{ 
       background:#f0f0f0; 
-      border:2px solid #6B46C1; 
+      border:2px solid #000000; 
       padding:12px; 
       margin:8px 0; 
       border-radius:8px;
@@ -88,43 +99,53 @@
       font-size:50px; 
       font-weight:900; 
       text-align:center; 
-      color:#6B46C1; 
+      color:#000000; 
       margin:20px 0;
     }
     .pill{
       display:inline-block;
       padding:8px 15px;
-      background:#6B46C1;
+      background:#000000;
       color:#fff;
       border-radius:20px;
       font-weight:bold;
       margin:10px 0;
+    }
+    input:focus {
+      outline: none;
+      box-shadow: 0 0 10px rgba(0,0,0,0.2);
+    }
+    #codeInput {
+      text-align: center;
+      font-size: 24px;
+      font-weight: bold;
+      letter-spacing: 5px;
     }
   </style>
 </head>
 <body>
   <div class="container">
     <h1>🕵️ IMPOSTER GAME</h1>
-    <p style="text-align:center; font-size:11px; color:#666; margin-bottom:15px;">GREY & PURPLE VERSION</p>
+    <p style="text-align:center; font-size:11px; color:#666; margin-bottom:15px;">BLACK & WHITE STRIPED VERSION</p>
 
     <div id="menu">
-      <button type="button" onclick="goCreate()">CREATE ROOM</button>
-      <button type="button" onclick="goJoin()" class="btn-grey">JOIN ROOM</button>
+      <button type="button" id="createBtn">CREATE ROOM</button>
+      <button type="button" id="joinBtn" class="btn-grey">JOIN ROOM</button>
       <div id="menuErr" class="status"></div>
     </div>
 
     <div id="create" class="hide">
       <h2>Create Room</h2>
-      <button type="button" onclick="doCreate()">GENERATE CODE</button>
-      <button type="button" onclick="goBack()" class="btn-grey">Back</button>
+      <button type="button" id="generateBtn">GENERATE CODE</button>
+      <button type="button" id="backFromCreate" class="btn-grey">Back</button>
       <div id="createErr" class="status"></div>
     </div>
 
     <div id="join" class="hide">
       <h2>Join Room</h2>
-      <input id="codeInput" type="text" maxlength="4" placeholder="Enter 4-digit code">
-      <button type="button" onclick="doJoin()">JOIN NOW</button>
-      <button type="button" onclick="goBack()" class="btn-grey">Back</button>
+      <input id="codeInput" type="text" maxlength="4" placeholder="Enter 4-digit code" pattern="\d*" inputmode="numeric">
+      <button type="button" id="joinNowBtn">JOIN NOW</button>
+      <button type="button" id="backFromJoin" class="btn-grey">Back</button>
       <div id="joinErr" class="status"></div>
     </div>
 
@@ -136,8 +157,8 @@
         <div style="font-weight:bold; margin-bottom:10px;">Players: <span id="pCount">0</span></div>
         <div id="pList"></div>
       </div>
-      <button type="button" onclick="doStart()">START GAME</button>
-      <button type="button" onclick="doClose()" class="btn-grey">CLOSE ROOM</button>
+      <button type="button" id="startBtn">START GAME</button>
+      <button type="button" id="closeBtn" class="btn-grey">CLOSE ROOM</button>
       <div id="lobbyErr" class="status"></div>
     </div>
 
@@ -150,10 +171,10 @@
     <div id="game" class="hide">
       <div class="pill" id="gameLabel">Player</div>
       <div class="roleBox" id="role">Loading...</div>
-      <div class="timer" id="timer"></div>
+      <div class="timer" id="timer">5:00</div>
       <div id="hostBtns" class="hide">
-        <button type="button" onclick="doEnd()">END ROUND</button>
-        <button type="button" onclick="doNew()" class="btn-grey">NEW ROUND</button>
+        <button type="button" id="endBtn">END ROUND</button>
+        <button type="button" id="newBtn" class="btn-grey">NEW ROUND</button>
       </div>
       <div id="gameErr" class="status"></div>
     </div>
@@ -163,7 +184,7 @@
   <script>
     const sb = window.supabase.createClient(
       "https://cpegnfupiqdgmqsguyed.supabase.co",
-      "sb_publishable_WKaLUCc9WeXbEcgDfMf1KQ_NKYoTVuU"
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNwZWduZnVwaXFkZ21xc2d1eWVkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzI4NTA5ODMsImV4cCI6MjA0ODQyNjk4M30.zHRNKkZ5Lly4q4fRZQzT5iWTtq67j3JNkaf3-_W8BkI"
     );
 
     let code = null;
@@ -172,6 +193,7 @@
     let host = false;
     let poll = null;
     let tmr = null;
+    let currentWord = null;
 
     const sc = {
       menu: document.getElementById("menu"),
@@ -182,48 +204,84 @@
       game: document.getElementById("game")
     };
 
+    // Event Listeners
+    document.getElementById("createBtn").addEventListener("click", goCreate);
+    document.getElementById("joinBtn").addEventListener("click", goJoin);
+    document.getElementById("generateBtn").addEventListener("click", doCreate);
+    document.getElementById("joinNowBtn").addEventListener("click", doJoin);
+    document.getElementById("backFromCreate").addEventListener("click", goBack);
+    document.getElementById("backFromJoin").addEventListener("click", goBack);
+    document.getElementById("startBtn").addEventListener("click", doStart);
+    document.getElementById("closeBtn").addEventListener("click", doClose);
+    document.getElementById("endBtn").addEventListener("click", doEnd);
+    document.getElementById("newBtn").addEventListener("click", doNew);
+
+    // Code input formatting
+    document.getElementById("codeInput").addEventListener("input", function(e) {
+      this.value = this.value.replace(/\D/g, '').slice(0, 4);
+    });
+
     function hideAll() {
-      Object.values(sc).forEach(s => s.className = "hide");
+      Object.values(sc).forEach(s => s.classList.add("hide"));
     }
 
     function goCreate() {
       hideAll();
-      sc.create.className = "";
+      sc.create.classList.remove("hide");
+      document.getElementById("createErr").textContent = "";
     }
 
     function goJoin() {
       hideAll();
-      sc.join.className = "";
+      sc.join.classList.remove("hide");
+      document.getElementById("codeInput").focus();
+      document.getElementById("joinErr").textContent = "";
     }
 
     function goBack() {
       if(poll) clearInterval(poll);
       hideAll();
-      sc.menu.className = "";
+      sc.menu.classList.remove("hide");
     }
 
     async function doCreate() {
       document.getElementById("createErr").textContent = "";
       try {
+        // Generate player ID if not exists
         pid = ss("pid") || ("p_" + rand());
         ss("pid", pid);
 
+        // Generate 4-digit code
         code = String(Math.floor(1000 + Math.random() * 9000));
+        
+        console.log("Creating room with code:", code);
 
-        const {error:re} = await sb.from("rooms").insert([{
+        // Create room
+        const {error: re} = await sb.from("rooms").insert([{
           code: code,
           status: "open",
           state: "waiting",
-          host_player_id: pid
+          host_player_id: pid,
+          created_at: new Date().toISOString()
         }]);
-        if(re) throw re;
+        
+        if(re) {
+          console.error("Room creation error:", re);
+          throw re;
+        }
 
-        const {error:pe} = await sb.from("players").insert([{
+        // Add host as player 1
+        const {error: pe} = await sb.from("players").insert([{
           room_code: code,
           player_id: pid,
-          player_num: 1
+          player_num: 1,
+          joined_at: new Date().toISOString()
         }]);
-        if(pe) throw pe;
+        
+        if(pe) {
+          console.error("Player creation error:", pe);
+          throw pe;
+        }
 
         pnum = 1;
         host = true;
@@ -233,11 +291,12 @@
 
         document.getElementById("lobbyCode").textContent = code;
         hideAll();
-        sc.lobby.className = "";
+        sc.lobby.classList.remove("hide");
         doPoll();
 
       } catch(e) {
-        document.getElementById("createErr").textContent = e.message;
+        console.error("Create error:", e);
+        document.getElementById("createErr").textContent = e.message || "Failed to create room";
       }
     }
 
@@ -245,45 +304,67 @@
       document.getElementById("joinErr").textContent = "";
       try {
         code = document.getElementById("codeInput").value.trim();
+        
         if(!/^\d{4}$/.test(code)) {
           document.getElementById("joinErr").textContent = "Enter 4 digits";
           return;
         }
 
+        console.log("Joining room:", code);
+
+        // Generate player ID if not exists
         pid = ss("pid") || ("p_" + rand());
         ss("pid", pid);
 
-        const {data:rm, error:re} = await sb.from("rooms")
-          .select("*").eq("code", code).maybeSingle();
+        // Check if room exists and is open
+        const {data: rm, error: re} = await sb.from("rooms")
+          .select("*")
+          .eq("code", code)
+          .maybeSingle();
+          
         if(re) throw re;
+        
         if(!rm) {
           document.getElementById("joinErr").textContent = "Room not found";
           return;
         }
+        
         if(rm.status !== "open") {
-          document.getElementById("joinErr").textContent = "Room closed";
+          document.getElementById("joinErr").textContent = "Room is closed";
           return;
         }
 
-        const {data:ex} = await sb.from("players")
-          .select("player_num").eq("room_code", code).eq("player_id", pid).maybeSingle();
+        // Check if player already exists in this room
+        const {data: ex} = await sb.from("players")
+          .select("player_num")
+          .eq("room_code", code)
+          .eq("player_id", pid)
+          .maybeSingle();
 
         if(ex) {
           pnum = ex.player_num;
+          console.log("Existing player, number:", pnum);
         } else {
-          const {data:pls} = await sb.from("players")
-            .select("player_num").eq("room_code", code);
-          const used = new Set((pls||[]).map(p => p.player_num));
+          // Get all players to determine next number
+          const {data: pls} = await sb.from("players")
+            .select("player_num")
+            .eq("room_code", code);
+            
+          const used = new Set((pls || []).map(p => p.player_num));
           let n = 1;
           while(used.has(n)) n++;
 
-          const {error:ae} = await sb.from("players").insert([{
+          // Add new player
+          const {error: ae} = await sb.from("players").insert([{
             room_code: code,
             player_id: pid,
-            player_num: n
+            player_num: n,
+            joined_at: new Date().toISOString()
           }]);
+          
           if(ae) throw ae;
           pnum = n;
+          console.log("New player, number:", pnum);
         }
 
         host = false;
@@ -293,116 +374,186 @@
 
         document.getElementById("waitLabel").textContent = "Player " + pnum;
         hideAll();
-        sc.waiting.className = "";
+        sc.waiting.classList.remove("hide");
         doPoll();
 
       } catch(e) {
-        document.getElementById("joinErr").textContent = e.message;
+        console.error("Join error:", e);
+        document.getElementById("joinErr").textContent = e.message || "Failed to join room";
       }
     }
 
     async function doStart() {
       document.getElementById("lobbyErr").textContent = "";
       try {
-        const {data:pls} = await sb.from("players").select("player_id").eq("room_code", code);
+        // Get all players
+        const {data: pls} = await sb.from("players")
+          .select("player_id")
+          .eq("room_code", code);
+          
         if(!pls || pls.length < 2) {
-          document.getElementById("lobbyErr").textContent = "Need 2+ players";
+          document.getElementById("lobbyErr").textContent = "Need at least 2 players";
           return;
         }
 
-        const {data:wds} = await sb.from("words").select("text");
-        if(!wds || wds.length === 0) throw new Error("No words");
-        const word = wds[Math.floor(Math.random() * wds.length)].text;
+        console.log("Starting game with players:", pls.length);
 
-        const impCnt = pls.length >= 5 ? 2 : 1;
-        const sh = [...pls].sort(() => Math.random() - 0.5);
-        const imps = sh.slice(0, impCnt).map(p => p.player_id);
+        // Get random word from Supabase
+        const {data: wds, error: wdErr} = await sb.from("words").select("text");
+        
+        if(wdErr) throw wdErr;
+        if(!wds || wds.length === 0) {
+          document.getElementById("lobbyErr").textContent = "No words available";
+          return;
+        }
+        
+        const wordData = wds[Math.floor(Math.random() * wds.length)];
+        currentWord = wordData.text;
+        console.log("Selected word:", currentWord);
 
-        await sb.from("rooms").update({
+        // Determine number of imposters based on player count
+        const playerCount = pls.length;
+        const imposterCount = playerCount >= 5 ? 2 : 1;
+        console.log(`Players: ${playerCount}, Imposters: ${imposterCount}`);
+
+        // Shuffle players and select imposters
+        const shuffledPlayers = [...pls].sort(() => Math.random() - 0.5);
+        const imposters = shuffledPlayers.slice(0, imposterCount).map(p => p.player_id);
+        
+        console.log("Imposters selected:", imposters);
+
+        // Update room state
+        const {error: ue} = await sb.from("rooms").update({
           state: "playing",
-          word: word,
-          spy_player_id: imps[0],
-          imposters: imps,
+          word: currentWord,
+          spy_player_id: imposters[0],
+          imposters: imposters,
           started_at: new Date().toISOString()
         }).eq("code", code);
+        
+        if(ue) throw ue;
+
+        console.log("Game started successfully");
 
       } catch(e) {
-        document.getElementById("lobbyErr").textContent = e.message;
+        console.error("Start error:", e);
+        document.getElementById("lobbyErr").textContent = e.message || "Failed to start game";
       }
     }
 
     async function doEnd() {
       if(!confirm("End round?")) return;
-      await sb.from("rooms").update({state:"ended"}).eq("code", code);
+      
+      try {
+        await sb.from("rooms").update({state: "ended"}).eq("code", code);
+        console.log("Round ended");
+      } catch(e) {
+        console.error("End round error:", e);
+      }
     }
 
     async function doNew() {
-      if(!confirm("New round?")) return;
-      await sb.from("rooms").update({
-        state:"waiting",
-        word:null,
-        spy_player_id:null,
-        imposters:null,
-        started_at:null
-      }).eq("code", code);
+      if(!confirm("Start new round?")) return;
+      
+      try {
+        await sb.from("rooms").update({
+          state: "waiting",
+          word: null,
+          spy_player_id: null,
+          imposters: null,
+          started_at: null
+        }).eq("code", code);
+        
+        console.log("New round started");
+        
+        // Update local display
+        hideAll();
+        sc.lobby.classList.remove("hide");
+        document.getElementById("lobbyErr").textContent = "New round starting...";
+        document.getElementById("lobbyErr").className = "status success";
+        
+      } catch(e) {
+        console.error("New round error:", e);
+      }
     }
 
     async function doClose() {
-      if(!confirm("Close room?")) return;
-      await sb.from("rooms").update({status:"closed"}).eq("code", code);
-      await sb.from("players").delete().eq("room_code", code);
-      if(poll) clearInterval(poll);
-      goBack();
+      if(!confirm("Close room? All players will be disconnected.")) return;
+      
+      try {
+        await sb.from("rooms").update({status: "closed"}).eq("code", code);
+        await sb.from("players").delete().eq("room_code", code);
+        
+        if(poll) clearInterval(poll);
+        goBack();
+      } catch(e) {
+        console.error("Close room error:", e);
+      }
     }
 
     function doPoll() {
       if(poll) clearInterval(poll);
+      
       poll = setInterval(async () => {
         try {
-          const {data:rm} = await sb.from("rooms").select("*").eq("code", code).maybeSingle();
+          if(!code) return;
+          
+          const {data: rm, error: re} = await sb.from("rooms")
+            .select("*")
+            .eq("code", code)
+            .maybeSingle();
+            
+          if(re) throw re;
+          
           if(!rm || rm.status !== "open") {
             if(poll) clearInterval(poll);
-            alert("Room closed");
+            alert("Room has been closed");
             goBack();
             return;
           }
 
+          // Update lobby if host
           if(host && rm.state === "waiting") {
-            const {data:pls} = await sb.from("players")
-              .select("player_num, player_id").eq("room_code", code).order("player_num");
-            document.getElementById("pCount").textContent = pls.length;
-            document.getElementById("pList").innerHTML = pls
-              .map(p => `<div class="player">Player ${p.player_num}${p.player_id===pid?' (YOU)':''}</div>`)
-              .join("");
+            const {data: pls} = await sb.from("players")
+              .select("player_num, player_id")
+              .eq("room_code", code)
+              .order("player_num");
+              
+            if(pls) {
+              document.getElementById("pCount").textContent = pls.length;
+              document.getElementById("pList").innerHTML = pls
+                .map(p => `<div class="player">Player ${p.player_num}${p.player_id === pid ? ' (YOU - HOST)' : ''}</div>`)
+                .join("");
+            }
           }
 
+          // Handle game state changes
           if(rm.state === "playing" && rm.started_at) {
             showGame(rm);
-          }
-
-          if(rm.state === "ended") {
+          } else if(rm.state === "ended") {
             if(host) {
               hideAll();
-              sc.lobby.className = "";
-              document.getElementById("lobbyErr").textContent = "Round ended";
+              sc.lobby.classList.remove("hide");
+              document.getElementById("lobbyErr").textContent = "Round ended. Click 'NEW ROUND' to start again.";
+              document.getElementById("lobbyErr").className = "status";
             } else {
               hideAll();
-              sc.waiting.className = "";
-              document.getElementById("waitErr").textContent = "Round ended. Waiting...";
+              sc.waiting.classList.remove("hide");
+              document.getElementById("waitErr").textContent = "Round ended. Waiting for host...";
             }
           }
 
         } catch(e) {
-          console.error(e);
+          console.error("Poll error:", e);
         }
-      }, 1500);
+      }, 2000);
     }
 
     function showGame(rm) {
       hideAll();
-      sc.game.className = "";
+      sc.game.classList.remove("hide");
 
-      const imps = rm.imposters || [rm.spy_player_id];
+      const imps = rm.imposters || (rm.spy_player_id ? [rm.spy_player_id] : []);
       const isImp = imps.includes(pid);
 
       document.getElementById("gameLabel").textContent = "Player " + pnum;
@@ -410,27 +561,31 @@
 
       if(isImp) {
         rb.className = "roleBox spy";
-        rb.innerHTML = "🕵️ YOU ARE THE IMPOSTER";
+        rb.innerHTML = "🕵️<br><br>YOU ARE THE<br>IMPOSTER<br><br>🎭";
       } else {
         rb.className = "roleBox normal";
-        rb.innerHTML = `SECRET WORD:<div class="word">${esc(rm.word)}</div>`;
+        rb.innerHTML = `YOUR WORD IS:<div class="word">${esc(rm.word || "Unknown")}</div>`;
       }
 
+      // Show host buttons if host
       if(host) {
-        document.getElementById("hostBtns").className = "";
+        document.getElementById("hostBtns").classList.remove("hide");
       }
 
+      // Start timer
       const start = new Date(rm.started_at).getTime();
       if(tmr) clearInterval(tmr);
+      
       tmr = setInterval(() => {
-        const el = Math.floor((Date.now() - start) / 1000);
-        const rem = Math.max(0, 300 - el);
-        const m = Math.floor(rem / 60);
-        const s = rem % 60;
-        document.getElementById("timer").textContent = rem > 0
-          ? `${m}:${String(s).padStart(2,"0")}`
+        const elapsed = Math.floor((Date.now() - start) / 1000);
+        const remaining = Math.max(0, 300 - elapsed); // 5 minutes
+        const minutes = Math.floor(remaining / 60);
+        const seconds = remaining % 60;
+        
+        document.getElementById("timer").textContent = remaining > 0
+          ? `${minutes}:${String(seconds).padStart(2, "0")}`
           : "TIME UP ⏰";
-      }, 500);
+      }, 1000);
     }
 
     function ss(k, v) {
@@ -439,17 +594,16 @@
     }
 
     function rand() {
-      const a = new Uint8Array(16);
-      crypto.getRandomValues(a);
-      return Array.from(a).map(b => b.toString(16).padStart(2,"0")).join("");
+      return Date.now().toString(36) + Math.random().toString(36).substr(2);
     }
 
     function esc(s) {
-      return String(s).replace(/[&<>"']/g, m => ({
-        "&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"
-      }[m]));
+      const div = document.createElement('div');
+      div.textContent = s;
+      return div.innerHTML;
     }
 
+    // Initialize on page load
     window.addEventListener("load", () => {
       const c = ss("code");
       const n = ss("pnum");
@@ -462,14 +616,16 @@
         pid = p;
         host = h;
 
+        console.log("Restored session:", { code, pnum, pid, host });
+
         if(host) {
           document.getElementById("lobbyCode").textContent = code;
           hideAll();
-          sc.lobby.className = "";
+          sc.lobby.classList.remove("hide");
         } else {
           document.getElementById("waitLabel").textContent = "Player " + pnum;
           hideAll();
-          sc.waiting.className = "";
+          sc.waiting.classList.remove("hide");
         }
         doPoll();
       }
