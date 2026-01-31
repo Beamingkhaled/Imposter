@@ -123,7 +123,8 @@
         <input id="adminPass" type="password" placeholder="Enter password" />
       </div>
       <button id="loginBtn">Login</button>
-      <div class="small">Tip: don’t use Anonymous for both tabs if you’re testing old localStorage builds. This build uses Supabase, so you're fine.</div>
+      <div class="small">Password: admin123</div>
+      <div id="loginError" class="error"></div>
     </div>
 
     <div id="setupScreen" class="hidden">
@@ -159,7 +160,7 @@
         <div id="controlErr" class="error"></div>
       </div>
 
-      <div class="small">If your changes “don’t show”, hard refresh: iPad Safari/Brave → reload icon or clear cache.</div>
+      <div class="small">If your changes "don't show", hard refresh: iPad Safari/Brave → reload icon or clear cache.</div>
     </div>
   </div>
 
@@ -167,12 +168,12 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <script>
-    // ======== YOUR SUPABASE CONFIG (already filled) ========
+    // ======== SUPABASE CONFIG ========
     const SUPABASE_URL = "https://cpegnfupiqdgmqsguyed.supabase.co";
     const SUPABASE_ANON_KEY = "sb_publishable_WKaLUCc9WeXbEcgDfMf1KQ_NKYoTVuU";
     const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    // ======== ADMIN PASSWORD (change this) ========
+    // ======== ADMIN PASSWORD ========
     const ADMIN_PASSWORD = "admin123";
 
     // ======== STATE ========
@@ -184,6 +185,7 @@
     const setupScreen = document.getElementById("setupScreen");
     const controlScreen = document.getElementById("controlScreen");
 
+    const loginError = document.getElementById("loginError");
     const setupErr = document.getElementById("setupErr");
     const controlErr = document.getElementById("controlErr");
 
@@ -195,8 +197,16 @@
     const playerCount = document.getElementById("playerCount");
 
     document.getElementById("loginBtn").addEventListener("click", () => {
+      loginError.textContent = "";
       const pass = document.getElementById("adminPass").value;
-      if (pass !== ADMIN_PASSWORD) return alert("Wrong password");
+      console.log("Entered password:", pass);
+      console.log("Expected password:", ADMIN_PASSWORD);
+      
+      if (pass !== ADMIN_PASSWORD) {
+        loginError.textContent = "Wrong password. Try: admin123";
+        return;
+      }
+      
       loginScreen.classList.add("hidden");
       setupScreen.classList.remove("hidden");
     });
@@ -204,6 +214,10 @@
     document.getElementById("createRoomBtn").addEventListener("click", async () => {
       setupErr.textContent = "";
       try {
+        console.log("Creating room...");
+        console.log("Supabase URL:", SUPABASE_URL);
+        console.log("Supabase Key:", SUPABASE_ANON_KEY);
+        
         roomCode = await generateUnique4DigitCode();
         roomCodeInput.value = roomCode;
 
@@ -212,7 +226,10 @@
           .from("rooms")
           .insert([{ code: roomCode, status: "open", state: "waiting" }]);
 
-        if (error) throw error;
+        if (error) {
+          console.error("Supabase error:", error);
+          throw error;
+        }
 
         // show control
         setupScreen.classList.add("hidden");
@@ -222,7 +239,7 @@
         startPolling();
 
       } catch (e) {
-        console.error(e);
+        console.error("Full error:", e);
         setupErr.textContent = e?.message || "Failed creating room";
       }
     });
@@ -231,7 +248,10 @@
       controlErr.textContent = "";
       try {
         const players = await fetchPlayers();
-        if (players.length < 3) return alert("Need at least 3 players");
+        if (players.length < 3) {
+          controlErr.textContent = "Need at least 3 players";
+          return;
+        }
 
         // fetch all words once, pick random client-side
         const { data: words, error: werr } = await supabase
